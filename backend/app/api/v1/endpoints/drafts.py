@@ -12,7 +12,6 @@ from app.models.draft import Draft
 from app.schemas.agents import FactCheckResponse
 from app.schemas.draft import ApproveRequest, DraftRead, ReviseRequest
 from app.schemas.publish import PublishJobRead, PublishRequest
-from app.services.fact_check_service import FactCheckService
 from app.services.publish_service import PublishService
 
 router = APIRouter(prefix="/drafts", tags=["drafts"])

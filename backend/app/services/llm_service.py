@@ -17,14 +17,23 @@ class LLMService:
         messages: list[Message],
         *,
         model: Optional[str] = None,
+        agent_name: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: int = 1024,
         json_mode: bool = False,
     ) -> tuple[LLMResponse, int]:
+        """Call the LLM and return (response, latency_ms).
+
+        Pass *agent_name* to enable model routing: the router will select
+        strong vs cheap model tier automatically unless *model* is given
+        explicitly.
+        """
+        resolved_model = model or _route_model(agent_name)
+
         started = time.perf_counter()
         response = await self.provider.complete(
             messages,
-            model=model,
+            model=resolved_model,
             temperature=temperature,
             max_tokens=max_tokens,
             json_mode=json_mode,
@@ -35,6 +44,7 @@ class LLMService:
             extra={
                 "provider": self.provider.name,
                 "model": response.model,
+                "agent": agent_name or "unknown",
                 "latency_ms": latency_ms,
                 "tokens_in": response.tokens_input,
                 "tokens_out": response.tokens_output,
@@ -47,18 +57,31 @@ class LLMService:
         messages: list[Message],
         *,
         model: Optional[str] = None,
+        agent_name: Optional[str] = None,
         temperature: float = 0.5,
         max_tokens: int = 1024,
     ) -> tuple[dict[str, Any], LLMResponse, int]:
         response, latency_ms = await self.chat(
             messages,
             model=model,
+            agent_name=agent_name,
             temperature=temperature,
             max_tokens=max_tokens,
             json_mode=True,
         )
         payload = _safe_parse_json(response.text)
         return payload, response, latency_ms
+
+
+def _route_model(agent_name: Optional[str]) -> Optional[str]:
+    """Return the model string for the given agent, or None to let provider decide."""
+    if not agent_name:
+        return None
+    try:
+        from app.providers.llm.model_router import model_for_agent
+        return model_for_agent(agent_name)
+    except Exception:
+        return None
 
 
 def _safe_parse_json(text: str) -> dict[str, Any]:

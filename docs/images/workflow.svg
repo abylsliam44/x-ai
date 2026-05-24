@@ -1,0 +1,44 @@
+<svg width="1440" height="360" viewBox="0 0 1440 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Agentic workflow</title>
+  <desc id="desc">A seven-step workflow from input to publishing.</desc>
+  <rect width="1440" height="360" rx="28" fill="#0F172A"/>
+  <text x="72" y="72" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="30" font-weight="800">Editorial Pipeline</text>
+  <text x="72" y="108" fill="#BAE6FD" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="500">Every post moves through research, reasoning, quality gates, and human approval.</text>
+  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <g transform="translate(72 160)">
+      <rect width="152" height="92" rx="18" fill="#1E293B" stroke="#334155"/>
+      <text x="24" y="38" fill="#F8FAFC" font-size="16" font-weight="800">Input</text>
+      <text x="24" y="64" fill="#CBD5E1" font-size="13">Topic or URL</text>
+    </g>
+    <path d="M236 206H286" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(298 160)">
+      <rect width="152" height="92" rx="18" fill="#1E293B" stroke="#334155"/>
+      <text x="24" y="38" fill="#F8FAFC" font-size="16" font-weight="800">Research</text>
+      <text x="24" y="64" fill="#CBD5E1" font-size="13">Sources</text>
+    </g>
+    <path d="M462 206H512" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(524 160)">
+      <rect width="152" height="92" rx="18" fill="#1E293B" stroke="#334155"/>
+      <text x="24" y="38" fill="#F8FAFC" font-size="16" font-weight="800">Angles</text>
+      <text x="24" y="64" fill="#CBD5E1" font-size="13">Thesis options</text>
+    </g>
+    <path d="M688 206H738" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(750 160)">
+      <rect width="152" height="92" rx="18" fill="#1E293B" stroke="#334155"/>
+      <text x="24" y="38" fill="#F8FAFC" font-size="16" font-weight="800">Draft</text>
+      <text x="24" y="64" fill="#CBD5E1" font-size="13">Brand voice</text>
+    </g>
+    <path d="M914 206H964" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(976 160)">
+      <rect width="152" height="92" rx="18" fill="#1E293B" stroke="#334155"/>
+      <text x="24" y="38" fill="#F8FAFC" font-size="16" font-weight="800">Review</text>
+      <text x="24" y="64" fill="#CBD5E1" font-size="13">Facts and style</text>
+    </g>
+    <path d="M1140 206H1190" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(1202 160)">
+      <rect width="152" height="92" rx="18" fill="#22C55E"/>
+      <text x="24" y="38" fill="#052E16" font-size="16" font-weight="900">Publish</text>
+      <text x="24" y="64" fill="#14532D" font-size="13" font-weight="700">Human approved</text>
+    </g>
+  </g>
+</svg>

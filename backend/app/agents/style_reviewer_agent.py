@@ -31,7 +31,9 @@ class StyleReviewerAgent(BaseAgent):
             text = payload.get("text", "")
 
         service = StyleService(context.session, llm=context.llm)
-        score, notes = await service.score_style(text, style_context=style_context)
+        score, notes, model, tok_in, tok_out, latency = await service.score_style(
+            text, style_context=style_context
+        )
 
         if draft:
             draft.style_score = score
@@ -40,5 +42,8 @@ class StyleReviewerAgent(BaseAgent):
         return AgentResult(
             name=self.name,
             output={"score": score, "notes": notes, "draft_id": str(draft_id) if draft_id else None},
-            model="style",
+            model=model or "style",
+            tokens_input=tok_in,
+            tokens_output=tok_out,
+            latency_ms=latency,
         )

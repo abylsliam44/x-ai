@@ -1,0 +1,40 @@
+<svg width="1440" height="560" viewBox="0 0 1440 560" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Architecture</title>
+  <desc id="desc">A diagram showing frontend, backend, workers, data stores, and external providers.</desc>
+  <rect width="1440" height="560" rx="28" fill="#F8FAFC"/>
+  <text x="72" y="72" fill="#0F172A" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="30" font-weight="900">System Architecture</text>
+  <text x="72" y="108" fill="#475569" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="500">Production deployment uses Docker Compose, nginx, FastAPI, Celery, PostgreSQL, and Redis.</text>
+  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <rect x="72" y="168" width="220" height="96" rx="18" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="104" y="210" fill="#0F172A" font-size="19" font-weight="900">React Frontend</text>
+    <text x="104" y="238" fill="#64748B" font-size="14">Vite, TypeScript, UI</text>
+    <rect x="386" y="168" width="240" height="96" rx="18" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="418" y="210" fill="#0F172A" font-size="19" font-weight="900">FastAPI Backend</text>
+    <text x="418" y="238" fill="#64748B" font-size="14">REST, auth, orchestration</text>
+    <rect x="720" y="168" width="240" height="96" rx="18" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="752" y="210" fill="#0F172A" font-size="19" font-weight="900">Celery Workers</text>
+    <text x="752" y="238" fill="#64748B" font-size="14">Research, media, publish</text>
+    <rect x="1054" y="168" width="240" height="96" rx="18" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="1086" y="210" fill="#0F172A" font-size="19" font-weight="900">External APIs</text>
+    <text x="1086" y="238" fill="#64748B" font-size="14">OpenAI, Anthropic, X</text>
+    <path d="M292 216H386" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M626 216H720" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M960 216H1054" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+    <rect x="386" y="348" width="240" height="96" rx="18" fill="#ECFDF5" stroke="#86EFAC"/>
+    <text x="418" y="390" fill="#14532D" font-size="19" font-weight="900">PostgreSQL</text>
+    <text x="418" y="418" fill="#166534" font-size="14">Users, projects, traces</text>
+    <rect x="720" y="348" width="240" height="96" rx="18" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="752" y="390" fill="#7C2D12" font-size="19" font-weight="900">Redis</text>
+    <text x="752" y="418" fill="#9A3412" font-size="14">Broker, cache, results</text>
+    <rect x="1054" y="348" width="240" height="96" rx="18" fill="#EFF6FF" stroke="#93C5FD"/>
+    <text x="1086" y="390" fill="#1E3A8A" font-size="19" font-weight="900">Object Storage</text>
+    <text x="1086" y="418" fill="#1D4ED8" font-size="14">Generated media assets</text>
+    <path d="M506 264V348" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M840 264V348" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M840 396H1054" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+    <rect x="72" y="348" width="220" height="96" rx="18" fill="#111827"/>
+    <text x="104" y="390" fill="#F8FAFC" font-size="19" font-weight="900">nginx</text>
+    <text x="104" y="418" fill="#CBD5E1" font-size="14">TLS, routing, proxy</text>
+    <path d="M182 264V348" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

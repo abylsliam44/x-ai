@@ -1,0 +1,67 @@
+# ---- Secrets / environment ----
+.env
+.env.local
+.env.production
+.env.*.local
+backend/.env
+backend/.env.local
+backend/.env.production
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+*.log
+
+# ---- Node / Frontend ----
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+
+# ---- Storage / uploads ----
+backend/storage/
+backend/tests/.storage/
+storage/
+
+# ---- IDE ----
+.claude/
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ---- Docker ----
+.docker/
+
+# ---- Misc ----
+CLAUDE.md
+*.zip
+*.tar.gz

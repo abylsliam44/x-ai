@@ -36,12 +36,13 @@ class StyleService:
         text: str,
         *,
         style_context: str,
-    ) -> tuple[float, str]:
+    ) -> tuple[float, str, str | None, int, int, int]:
+        """Returns (score, notes, model, tokens_in, tokens_out, latency_ms)."""
         if not text.strip():
-            return 0.0, "Empty draft"
+            return 0.0, "Empty draft", None, 0, 0, 0
 
         if not style_context:
-            return 0.7, "No writing samples provided; using default tone heuristics."
+            return 0.7, "No writing samples provided; using default tone heuristics.", None, 0, 0, 0
 
         messages = [
             Message(
@@ -61,7 +62,16 @@ class StyleService:
                 ),
             ),
         ]
-        payload, _, _ = await self.llm.chat_json(messages, max_tokens=400)
+        payload, llm_resp, latency = await self.llm.chat_json(
+            messages, agent_name="style_reviewer_agent", max_tokens=400
+        )
         score = float(payload.get("score", 0.7))
         notes = str(payload.get("notes", "")).strip() or "Style is acceptable."
-        return max(0.0, min(1.0, score)), notes
+        return (
+            max(0.0, min(1.0, score)),
+            notes,
+            llm_resp.model,
+            llm_resp.tokens_input,
+            llm_resp.tokens_output,
+            latency,
+        )

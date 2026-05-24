@@ -33,11 +33,12 @@ class FactCheckService:
         self.rag = rag or RagService(session)
         self.research = research or ResearchService()
 
-    async def run(self, draft: Draft) -> FactCheckResponse:
+    async def run(self, draft: Draft) -> tuple[FactCheckResponse, str | None, int, int, int]:
+        """Returns (report, model_name, tokens_in, tokens_out, latency_ms)."""
         body = self._draft_body(draft)
         claim_candidates = extract_claim_candidates(body)
         if not claim_candidates:
-            return FactCheckResponse(draft_id=draft.id, overall_score=1.0, items=[])
+            return FactCheckResponse(draft_id=draft.id, overall_score=1.0, items=[]), None, 0, 0, 0
 
         retrieved: list[dict[str, Any]] = []
         for claim in claim_candidates:
@@ -82,7 +83,9 @@ class FactCheckService:
                 ),
             ),
         ]
-        payload, _, _ = await self.llm.chat_json(messages, max_tokens=900)
+        payload, llm_resp, latency = await self.llm.chat_json(
+            messages, agent_name="fact_checker_agent", max_tokens=900
+        )
         raw_items = payload.get("claims") or []
 
         items: list[FactCheckReportItem] = []
@@ -141,7 +144,13 @@ class FactCheckService:
         score = round(overall / denom, 3)
         draft.fact_check_score = score
         await self.session.flush()
-        return FactCheckResponse(draft_id=draft.id, overall_score=score, items=items)
+        return (
+            FactCheckResponse(draft_id=draft.id, overall_score=score, items=items),
+            llm_resp.model,
+            llm_resp.tokens_input,
+            llm_resp.tokens_output,
+            latency,
+        )
 
     @staticmethod
     def _draft_body(draft: Draft) -> str:

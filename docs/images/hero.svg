@@ -1,0 +1,45 @@
+<svg width="1440" height="520" viewBox="0 0 1440 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Agentic X Content Platform</title>
+  <desc id="desc">A polished hero graphic for an AI editorial platform.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1440" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.48" stop-color="#123026"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="128" y1="86" x2="1312" y2="436" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.06"/>
+    </linearGradient>
+    <filter id="shadow" x="92" y="54" width="1256" height="418" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="22" stdDeviation="28" flood-color="#000000" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+  <rect width="1440" height="520" fill="url(#bg)"/>
+  <g opacity="0.28">
+    <path d="M0 402C213 326 373 354 556 387C748 422 951 457 1440 310V520H0V402Z" fill="#22C55E"/>
+    <path d="M0 74C196 142 367 117 538 88C747 53 966 16 1440 122V0H0V74Z" fill="#38BDF8"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="128" y="86" width="1184" height="350" rx="28" fill="url(#panel)" stroke="#FFFFFF" stroke-opacity="0.18"/>
+    <rect x="160" y="118" width="1120" height="54" rx="18" fill="#0B1220" fill-opacity="0.64" stroke="#FFFFFF" stroke-opacity="0.11"/>
+    <circle cx="190" cy="145" r="7" fill="#EF4444"/>
+    <circle cx="215" cy="145" r="7" fill="#F59E0B"/>
+    <circle cx="240" cy="145" r="7" fill="#22C55E"/>
+    <rect x="1020" y="135" width="212" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.11"/>
+    <text x="184" y="248" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="64" font-weight="800">Agentic X Content Platform</text>
+    <text x="188" y="302" fill="#D1FAE5" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="26" font-weight="500">Research, draft, fact-check, approve, and publish with an AI editorial pipeline.</text>
+    <g transform="translate(184 340)">
+      <rect width="162" height="44" rx="14" fill="#22C55E"/>
+      <text x="24" y="29" fill="#052E16" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="800">Production ready</text>
+    </g>
+    <g transform="translate(366 340)">
+      <rect width="178" height="44" rx="14" fill="#FFFFFF" fill-opacity="0.1" stroke="#FFFFFF" stroke-opacity="0.16"/>
+      <text x="24" y="29" fill="#E5E7EB" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">Human approval</text>
+    </g>
+    <g transform="translate(564 340)">
+      <rect width="146" height="44" rx="14" fill="#FFFFFF" fill-opacity="0.1" stroke="#FFFFFF" stroke-opacity="0.16"/>
+      <text x="24" y="29" fill="#E5E7EB" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">X OAuth</text>
+    </g>
+  </g>
+</svg>

@@ -31,7 +31,9 @@ class OutlineAgent(BaseAgent):
                 ),
             ),
         ]
-        payload_json, response, latency = await context.llm.chat_json(messages, max_tokens=600)
+        payload_json, response, latency = await context.llm.chat_json(
+            messages, agent_name=self.name, max_tokens=600
+        )
         return AgentResult(
             name=self.name,
             output={"outline": payload_json.get("outline", []), "type": content_type},

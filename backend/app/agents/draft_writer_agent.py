@@ -51,7 +51,9 @@ class DraftWriterAgent(BaseAgent):
                 ),
             ),
         ]
-        payload_json, response, latency = await context.llm.chat_json(messages, max_tokens=1400)
+        payload_json, response, latency = await context.llm.chat_json(
+            messages, agent_name=self.name, max_tokens=1400
+        )
 
         output: dict[str, Any] = {"type": content_type}
         if "thread_items" in payload_json:

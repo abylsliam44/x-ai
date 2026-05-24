@@ -6,7 +6,7 @@ export interface User {
   full_name: string | null
   is_active: boolean
   created_at: string
-  updated_at: string
+  updated_at?: string
 }
 
 export interface TokenResponse {

@@ -17,7 +17,6 @@ import type { AngleOption, DraftRead, DraftType } from '../types/models'
 
 export function ProjectWorkspacePage() {
   const { id } = useParams<{ id: string }>()
-  const location = useLocation()
 
   const [stage, setStage] = useState<StageId>('sources')
   const [angles, setAngles] = useState<AngleOption[]>([])
@@ -72,7 +71,7 @@ export function ProjectWorkspacePage() {
   const handleApprove = async () => {
     setError('')
     try {
-      const res = await approveDraft()
+      const res = await approveDraft(undefined)
       setDraft(res)
       markComplete('review')
     } catch (err) {

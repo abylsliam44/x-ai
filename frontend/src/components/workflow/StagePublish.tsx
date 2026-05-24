@@ -39,7 +39,7 @@ export function StagePublish({ draft }: StagePublishProps) {
   const handlePublish = async () => {
     setPublishError('')
     try {
-      const job = await publishDraft()
+      const job = await publishDraft(undefined)
       setPublishResult(job)
       setShowPublishModal(false)
     } catch (err) {
@@ -61,9 +61,9 @@ export function StagePublish({ draft }: StagePublishProps) {
       {publishResult && (
         <div className="mb-6 px-4 py-4 border border-border2 rounded-xl bg-surface2">
           <div className="font-mono text-[10px] text-tx3 uppercase tracking-wider mb-1">
-            {publishResult.status === 'published' ? 'Published' : 'Job Queued'}
+            {publishResult.status === 'published' || publishResult.status === 'succeeded' ? 'Published' : 'Job Queued'}
           </div>
-          {publishResult.result?.tweet_url && (
+          {!!publishResult.result?.tweet_url && (
             <a
               href={String(publishResult.result.tweet_url)}
               target="_blank"

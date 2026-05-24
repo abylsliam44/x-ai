@@ -10,8 +10,10 @@ from httpx import ASGITransport, AsyncClient
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-os.environ.setdefault("MOCK_MODE", "true")
-os.environ.setdefault("DEFAULT_LLM_PROVIDER", "mock")
+# Force test-safe settings regardless of the container's .env values.
+# Tests must always run in mock mode — no real API calls, no real database.
+os.environ["MOCK_MODE"] = "true"
+os.environ["DEFAULT_LLM_PROVIDER"] = "mock"
 os.environ.setdefault("ENABLE_PGVECTOR", "false")
 os.environ.setdefault("STORAGE_PROVIDER", "local")
 os.environ.setdefault("LOCAL_STORAGE_PATH", str(ROOT / "tests" / ".storage"))
@@ -19,7 +21,9 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 
 from app.core.config import get_settings  # noqa: E402
+from app.providers.llm.factory import get_llm_provider  # noqa: E402
 get_settings.cache_clear()  # type: ignore[attr-defined]
+get_llm_provider.cache_clear()  # type: ignore[attr-defined]
 
 import fakeredis.aioredis  # noqa: E402
 

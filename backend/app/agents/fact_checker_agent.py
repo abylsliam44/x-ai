@@ -26,10 +26,13 @@ class FactCheckerAgent(BaseAgent):
                 status="error",
                 error_message="Draft missing",
             )
-        service = FactCheckService(context.session)
-        report = await service.run(draft)
+        service = FactCheckService(context.session, llm=context.llm)
+        report, model, tok_in, tok_out, latency = await service.run(draft)
         return AgentResult(
             name=self.name,
             output=report.model_dump(mode="json"),
-            model="fact-check",
+            model=model or "fact-check",
+            tokens_input=tok_in,
+            tokens_output=tok_out,
+            latency_ms=latency,
         )

@@ -66,7 +66,7 @@ def fact_check_task(draft_id: str) -> dict[str, Any]:
             if not draft:
                 return {"error": "draft not found"}
             service = FactCheckService(session)
-            report = await service.run(draft)
+            report, *_ = await service.run(draft)
             await session.commit()
             return report.model_dump(mode="json")
 

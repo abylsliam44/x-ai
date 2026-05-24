@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Optional
 
 from app.core.config import settings
 from app.providers.llm.base import LLMProvider
@@ -6,7 +7,7 @@ from app.providers.llm.mock_provider import MockLLMProvider
 
 
 @lru_cache
-def get_llm_provider(name: str | None = None) -> LLMProvider:
+def get_llm_provider(name: Optional[str] = None) -> LLMProvider:
     chosen = (name or settings.DEFAULT_LLM_PROVIDER).lower()
     if settings.MOCK_MODE or chosen == "mock":
         return MockLLMProvider()

@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -12,11 +13,16 @@ class XConnectResponse(BaseModel):
 
 class XStatusResponse(BaseModel):
     connected: bool
-    account_id: uuid.UUID | None = None
-    username: str | None = None
-    x_user_id: str | None = None
-    connected_at: datetime | None = None
+    account_id: Optional[uuid.UUID] = None
+    username: Optional[str] = None
+    x_user_id: Optional[str] = None
+    connected_at: Optional[datetime] = None
     scopes: list[str] = []
+    token_expires_at: Optional[datetime] = None
+    # True when ENABLE_REAL_X_API=true (not mock mode)
+    real_mode: bool = False
+    # True when connected, token is valid, and real X API is enabled
+    can_publish: bool = False
 
 
 class XCallbackResponse(BaseModel):

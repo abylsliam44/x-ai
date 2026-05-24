@@ -36,7 +36,9 @@ class AngleAgent(BaseAgent):
                 ),
             ),
         ]
-        payload_json, response, latency = await context.llm.chat_json(messages, max_tokens=900)
+        payload_json, response, latency = await context.llm.chat_json(
+            messages, agent_name=self.name, max_tokens=900
+        )
         return AgentResult(
             name=self.name,
             output={"angles": payload_json.get("angles", []), "topic": topic},
