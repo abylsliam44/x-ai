@@ -20,7 +20,12 @@ def get_image_provider() -> ImageProvider:
 
 @lru_cache
 def get_audio_provider() -> AudioProvider:
-    if settings.MOCK_MODE or not settings.ENABLE_REAL_MEDIA_GENERATION or settings.DEFAULT_AUDIO_PROVIDER == "mock":
+    real_requested = (
+        settings.ENABLE_REAL_TTS
+        or settings.ENABLE_REAL_STT
+        or settings.ENABLE_REAL_MEDIA_GENERATION
+    )
+    if settings.MOCK_MODE or not real_requested or not settings.OPENAI_API_KEY:
         return MockAudioProvider()
     from app.providers.media.audio_provider import OpenAIAudioProvider
 

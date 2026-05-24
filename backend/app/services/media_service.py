@@ -180,6 +180,35 @@ class MediaService:
         await self.session.flush()
         return asset
 
+    async def text_to_speech(
+        self,
+        *,
+        user_id: uuid.UUID,
+        draft_id: Optional[uuid.UUID],
+        text: str,
+        voice: str = "alloy",
+    ) -> MediaAsset:
+        result = await self.audio.text_to_speech(text, voice=voice)
+        stored = await self.storage.save_bytes(result.binary, mime_type=result.mime_type, prefix="audio")
+        asset = MediaAsset(
+            user_id=user_id,
+            draft_id=draft_id,
+            type="audio",
+            file_url=stored.url,
+            storage_key=stored.key,
+            mime_type=result.mime_type,
+            size_bytes=stored.size_bytes,
+            duration_seconds=result.duration_seconds,
+            status="ready",
+            meta={"text": text[:200], "voice": voice, "provider": self.audio.name},
+        )
+        self.session.add(asset)
+        await self.session.flush()
+        return asset
+
+    async def speech_to_text(self, audio_bytes: bytes, *, mime_type: str) -> str:
+        return await self.audio.transcribe(audio_bytes, mime_type=mime_type)
+
     async def get(self, asset_id: uuid.UUID, user_id: uuid.UUID) -> MediaAsset:
         asset = await self.session.get(MediaAsset, asset_id)
         if not asset or asset.user_id != user_id:

@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, Request, status
 from sqlalchemy import select
 
 from app.api.deps import CurrentUserDep, SessionDep
@@ -11,6 +11,8 @@ from app.schemas.media import (
     GenerateVideoRequest,
     GenerateVoiceVideoRequest,
     MediaRead,
+    SpeechToTextResponse,
+    TextToSpeechRequest,
 )
 from app.services.media_service import MediaService
 
@@ -101,6 +103,33 @@ async def generate_video(
     await session.commit()
     await session.refresh(asset)
     return MediaRead.model_validate(asset)
+
+
+@router.post("/text-to-speech", response_model=MediaRead, status_code=status.HTTP_201_CREATED)
+async def text_to_speech(
+    payload: TextToSpeechRequest, user: CurrentUserDep, session: SessionDep
+) -> MediaRead:
+    service = MediaService(session)
+    asset = await service.text_to_speech(
+        user_id=user.id,
+        draft_id=payload.draft_id,
+        text=payload.text,
+        voice=payload.voice,
+    )
+    await session.commit()
+    await session.refresh(asset)
+    return MediaRead.model_validate(asset)
+
+
+@router.post("/speech-to-text", response_model=SpeechToTextResponse)
+async def speech_to_text(
+    request: Request, user: CurrentUserDep, session: SessionDep
+) -> SpeechToTextResponse:
+    audio_bytes = await request.body()
+    content_type = request.headers.get("content-type", "audio/wav")
+    service = MediaService(session)
+    transcript = await service.speech_to_text(audio_bytes, mime_type=content_type)
+    return SpeechToTextResponse(text=transcript)
 
 
 @router.get("/{asset_id}", response_model=MediaRead)

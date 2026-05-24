@@ -49,9 +49,13 @@ os.environ.setdefault("STORAGE_PROVIDER", "local")
 # ── 3. Clear cached settings / providers ─────────────────────────────────────
 from app.core.config import get_settings          # noqa: E402
 from app.providers.llm.factory import get_llm_provider  # noqa: E402
+from app.providers.media import get_audio_provider, get_image_provider, get_video_provider  # noqa: E402
 
 get_settings.cache_clear()
 get_llm_provider.cache_clear()
+get_audio_provider.cache_clear()
+get_image_provider.cache_clear()
+get_video_provider.cache_clear()
 
 # ── 4. Wire in fakeredis (same trick as mock conftest) ────────────────────────
 import fakeredis.aioredis                         # noqa: E402

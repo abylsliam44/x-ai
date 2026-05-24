@@ -49,3 +49,13 @@ class GenerateVideoRequest(BaseModel):
     draft_id: uuid.UUID | None = None
     prompt: str
     duration_seconds: int = Field(default=10, ge=2, le=140)
+
+
+class TextToSpeechRequest(BaseModel):
+    draft_id: uuid.UUID | None = None
+    text: str = Field(min_length=1, max_length=4096)
+    voice: str = "alloy"
+
+
+class SpeechToTextResponse(BaseModel):
+    text: str
