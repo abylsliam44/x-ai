@@ -9,7 +9,7 @@ Requires:
 Run from the backend/ directory:
     cd backend && python ../scripts/test_openai_real_image.py
 
-The generated image URL is printed. DALL-E URLs expire after ~1 hour.
+The generated image is written to ./openai_test_image.png.
 """
 import asyncio
 import sys
@@ -44,8 +44,8 @@ async def main() -> None:
     print(f"Image model: {settings.OPENAI_IMAGE_MODEL}")
     print()
 
-    from app.providers.llm.openai_provider import OpenAIProvider
-    provider = OpenAIProvider()
+    from app.providers.media.image_provider import OpenAIImageProvider
+    provider = OpenAIImageProvider()
 
     prompt = (
         "A clean minimal quote card with dark background. "
@@ -55,22 +55,16 @@ async def main() -> None:
     print(f"Prompt: {prompt}")
     print()
 
-    urls = await provider.generate_image(
+    result = await provider.generate_image(
         prompt,
-        model=settings.OPENAI_IMAGE_MODEL,
-        size="1024x1024",
-        quality="standard",
-        n=1,
+        aspect_ratio="1:1",
     )
 
-    if not urls:
-        print("ERROR: No image URLs returned.")
-        sys.exit(1)
-
-    print("--- Generated Image URL ---")
-    print(urls[0])
-    print()
-    print("NOTE: DALL-E URLs expire after ~1 hour.")
+    output = Path.cwd() / "openai_test_image.png"
+    output.write_bytes(result.binary)
+    print("--- Generated Image ---")
+    print(output)
+    print(f"{result.width}x{result.height} · {result.mime_type} · {len(result.binary)} bytes")
     print()
     print("Test PASSED.")
 

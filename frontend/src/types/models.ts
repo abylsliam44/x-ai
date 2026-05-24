@@ -59,11 +59,13 @@ export type DraftType =
 
 export type DraftStatus =
   | 'draft'
+  | 'generating'
   | 'ready_for_review'
   | 'approved'
   | 'scheduled'
+  | 'publishing'
   | 'published'
-  | 'rejected'
+  | 'failed'
 
 export interface DraftRead {
   id: string
@@ -82,6 +84,22 @@ export interface DraftRead {
   x_post_id: string | null
   created_at: string
   updated_at: string
+}
+
+export interface MediaRead {
+  id: string
+  user_id: string
+  draft_id: string | null
+  type: string
+  file_url: string | null
+  storage_key: string | null
+  mime_type: string | null
+  size_bytes: number | null
+  duration_seconds: number | null
+  x_media_id: string | null
+  status: string
+  meta: Record<string, unknown> | null
+  created_at: string
 }
 
 export interface AngleOption {

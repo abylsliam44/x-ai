@@ -173,3 +173,42 @@ async def test_image_media_generation(client):
     assert asset["status"] == "ready"
     assert asset["type"] == "image"
     assert asset["file_url"]
+
+    listed = await client.get(
+        "/api/v1/media",
+        params={"draft_id": asset["draft_id"]} if asset["draft_id"] else {},
+        headers=headers,
+    )
+    assert listed.status_code == 200, listed.text
+    assert any(item["id"] == asset["id"] for item in listed.json())
+
+
+@pytest.mark.asyncio
+async def test_draft_workflow_with_media(client):
+    register = await client.post(
+        "/api/v1/auth/register",
+        json={"email": "workflow-media@example.com", "password": "supersecret1"},
+    )
+    token = register.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    project = await client.post(
+        "/api/v1/projects",
+        json={"title": "Image post", "topic": "Why judgment beats generation"},
+        headers=headers,
+    )
+    project_id = project.json()["id"]
+
+    draft = await client.post(
+        f"/api/v1/projects/{project_id}/generate-draft",
+        json={"type": "image_post", "include_media": True},
+        headers=headers,
+    )
+    assert draft.status_code == 200, draft.text
+    draft_id = draft.json()["id"]
+
+    media = await client.get("/api/v1/media", params={"draft_id": draft_id}, headers=headers)
+    assert media.status_code == 200, media.text
+    body = media.json()
+    assert len(body) >= 1
+    assert body[0]["type"] == "image"

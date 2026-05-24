@@ -49,7 +49,14 @@ export function ProjectWorkspacePage() {
   const handleGenerateDraft = async (type: DraftType, angle: AngleOption | null, instructions?: string) => {
     setError('')
     try {
-      const res = await generateDraft({ type, angle: angle ?? undefined, instructions: instructions ?? undefined })
+      const includeMedia = type === 'image_post'
+      const res = await generateDraft({
+        type,
+        angle: angle ?? undefined,
+        instructions: instructions ?? undefined,
+        includeMedia,
+        mediaPreferences: includeMedia ? { aspect_ratio: '1:1' } : undefined,
+      })
       setDraft(res)
       markComplete('angles')
       setStage('draft')

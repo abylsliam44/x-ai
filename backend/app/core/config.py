@@ -70,6 +70,8 @@ class Settings(BaseSettings):
     OPENAI_MAX_OUTPUT_TOKENS: int = 4000
     OPENAI_REASONING_EFFORT: str = "medium"
     OPENAI_ENABLE_WEB_SEARCH: bool = False
+    OPENAI_WEB_SEARCH_MODEL: str = "gpt-5.4-mini"
+    OPENAI_WEB_SEARCH_CONTEXT_SIZE: Literal["low", "medium", "high"] = "low"
 
     # Anthropic
     ANTHROPIC_API_KEY: Optional[str] = None
@@ -79,7 +81,7 @@ class Settings(BaseSettings):
     DEFAULT_IMAGE_PROVIDER: Literal["openai", "stability", "mock"] = "mock"
     DEFAULT_AUDIO_PROVIDER: Literal["openai", "elevenlabs", "mock"] = "mock"
     DEFAULT_VIDEO_PROVIDER: Literal["runway", "luma", "mock"] = "mock"
-    DEFAULT_SEARCH_PROVIDER: Literal["tavily", "serper", "mock"] = "mock"
+    DEFAULT_SEARCH_PROVIDER: Literal["openai", "tavily", "serper", "mock"] = "mock"
 
     # --- X / Twitter ---
     ENABLE_REAL_X_API: bool = False
@@ -97,6 +99,7 @@ class Settings(BaseSettings):
     X_ENABLE_REAL_MEDIA_UPLOAD: bool = False
     X_ENABLE_REAL_IMAGE_UPLOAD: bool = False
     X_ENABLE_REAL_VIDEO_UPLOAD: bool = False
+    ENABLE_REAL_X_SEARCH: bool = False
     X_MAX_IMAGES_PER_POST: int = 4
 
     # --- Feature flags ---
@@ -196,6 +199,26 @@ class Settings(BaseSettings):
             raise ValueError(
                 "ANTHROPIC_API_KEY is required when MOCK_MODE=false and "
                 "DEFAULT_LLM_PROVIDER=anthropic."
+            )
+
+        if (
+            self.ENABLE_REAL_WEB_SEARCH
+            and self.DEFAULT_SEARCH_PROVIDER == "openai"
+            and not self.OPENAI_API_KEY
+        ):
+            raise ValueError(
+                "OPENAI_API_KEY is required when ENABLE_REAL_WEB_SEARCH=true "
+                "and DEFAULT_SEARCH_PROVIDER=openai."
+            )
+
+        if (
+            self.ENABLE_REAL_IMAGE_GENERATION
+            and self.DEFAULT_IMAGE_PROVIDER == "openai"
+            and not self.OPENAI_API_KEY
+        ):
+            raise ValueError(
+                "OPENAI_API_KEY is required when ENABLE_REAL_IMAGE_GENERATION=true "
+                "and DEFAULT_IMAGE_PROVIDER=openai."
             )
 
         if self.ENABLE_REAL_X_API:

@@ -4,6 +4,7 @@ import { Spinner } from '../common/Spinner'
 import { XPreview } from '../drafts/XPreview'
 import { useXStatus, useXConnect } from '../../hooks/useXConnection'
 import { usePublishDraft } from '../../hooks/useDrafts'
+import { useMediaAssets } from '../../hooks/useMedia'
 import type { DraftRead, PublishJobRead } from '../../types/models'
 import { draftTypeLabel } from '../../lib/utils'
 
@@ -15,6 +16,7 @@ export function StagePublish({ draft }: StagePublishProps) {
   const { data: xStatus } = useXStatus()
   const { mutateAsync: connect, isPending: isConnecting } = useXConnect()
   const { mutateAsync: publishDraft, isPending: isPublishing } = usePublishDraft(draft?.id)
+  const { data: mediaAssets = [] } = useMediaAssets(draft?.id)
   const [publishResult, setPublishResult] = useState<PublishJobRead | null>(null)
   const [publishError, setPublishError] = useState('')
   const [showPublishModal, setShowPublishModal] = useState(false)
@@ -34,7 +36,9 @@ export function StagePublish({ draft }: StagePublishProps) {
     return draft.text ? [draft.text] : []
   })()
 
-  const canPublish = draft.status === 'approved' && xStatus?.connected
+  const imageAssets = mediaAssets.filter((asset) => asset.type === 'image' || asset.type === 'carousel_image')
+  const requiresImage = draft.type === 'image_post' || draft.type === 'carousel_post'
+  const canPublish = draft.status === 'approved' && xStatus?.connected && (!requiresImage || imageAssets.length > 0)
 
   const handlePublish = async () => {
     setPublishError('')
@@ -108,6 +112,11 @@ export function StagePublish({ draft }: StagePublishProps) {
                   label: 'Content ready',
                   val: `${posts.length} post${posts.length !== 1 ? 's' : ''}`,
                 },
+                ...(requiresImage ? [{
+                  ok: imageAssets.length > 0,
+                  label: 'Image ready',
+                  val: `${imageAssets.length} image${imageAssets.length !== 1 ? 's' : ''}`,
+                }] : []),
               ].map((c, i) => (
                 <div
                   key={i}

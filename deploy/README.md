@@ -15,6 +15,9 @@ This installs Docker, Docker Compose plugin, configures a 4 GB swapfile, and ope
 
 ```bash
 # On the server, inside the project root:
+cp .env.production.example .env
+nano .env            # Fill POSTGRES_PASSWORD, DOMAIN, LETSENCRYPT_EMAIL
+
 cp backend/.env.production.example backend/.env
 nano backend/.env   # Fill in: SECRET_KEY, OPENAI_API_KEY, X_CLIENT_ID, X_CLIENT_SECRET
 ```
@@ -27,6 +30,7 @@ nano backend/.env   # Fill in: SECRET_KEY, OPENAI_API_KEY, X_CLIENT_ID, X_CLIENT
 | `X_CLIENT_ID` | X Developer app Client ID |
 | `X_CLIENT_SECRET` | X Developer app Client Secret |
 | `X_REDIRECT_URI` | Must match your registered redirect URI exactly |
+| `POSTGRES_PASSWORD` | Root `.env`; at least 16 chars, not `postgres` |
 
 ## Deploy
 
@@ -61,28 +65,14 @@ This:
 
 ## SSL / HTTPS with Let's Encrypt
 
-Install certbot on the server:
+Obtain a certificate through the Docker certbot service:
 
 ```bash
-apt-get install -y certbot python3-certbot-nginx
+./deploy/issue_ssl.sh yourdomain.com admin@yourdomain.com
 ```
 
-Obtain a certificate (replace `yourdomain.com`):
-
-```bash
-certbot certonly --webroot -w /var/www/certbot -d yourdomain.com -d www.yourdomain.com
-```
-
-Then edit `nginx/conf.d/app.conf`:
-- Uncomment the `return 301 https://...` line in the HTTP server block
-- Uncomment the full HTTPS server block
-- Replace `YOUR_DOMAIN` with your actual domain
-
-Reload nginx:
-
-```bash
-docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
-```
+This uses the shared certbot Docker volumes, writes the HTTPS nginx config from
+`nginx/conf.d/app.https.template`, validates nginx, and reloads it.
 
 ## Logs
 

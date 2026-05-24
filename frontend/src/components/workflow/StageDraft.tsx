@@ -5,10 +5,12 @@ import { FactCheckPanel } from '../drafts/FactCheckPanel'
 import { StylePanel } from '../drafts/StylePanel'
 import { AgentTracesPanel } from '../drafts/AgentTracesPanel'
 import { XPreview } from '../drafts/XPreview'
-import type { AngleOption, DraftRead, DraftType } from '../../types/models'
+import { assetUrl, ApiError } from '../../lib/api'
+import { useGenerateImage, useMediaAssets } from '../../hooks/useMedia'
+import type { AngleOption, DraftRead, DraftType, MediaRead } from '../../types/models'
 import { draftTypeLabel } from '../../lib/utils'
 
-type RightTab = 'fact-check' | 'style' | 'traces' | 'preview'
+type RightTab = 'fact-check' | 'style' | 'traces' | 'preview' | 'media'
 
 const DRAFT_TYPES: DraftType[] = [
   'text_post', 'thread', 'quote_post', 'image_post',
@@ -180,7 +182,7 @@ export function StageDraft({
           {/* Right: Panel tabs */}
           <div>
             <div className="flex border-b border-border mb-4">
-              {(['preview', 'fact-check', 'style', 'traces'] as RightTab[]).map((tab) => (
+              {(['preview', 'media', 'fact-check', 'style', 'traces'] as RightTab[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setRightTab(tab)}
@@ -200,6 +202,9 @@ export function StageDraft({
             {rightTab === 'preview' && (
               <XPreview posts={posts} draftType={draft.type} />
             )}
+            {rightTab === 'media' && (
+              <MediaPanel draft={draft} selectedAngle={selectedAngle} />
+            )}
             {rightTab === 'fact-check' && (
               <FactCheckPanel draftId={draft.id} />
             )}
@@ -213,6 +218,129 @@ export function StageDraft({
         </div>
       )}
     </div>
+  )
+}
+
+function MediaPanel({
+  draft,
+  selectedAngle,
+}: {
+  draft: DraftRead
+  selectedAngle: AngleOption | null
+}) {
+  const defaultPrompt = selectedAngle?.hook || draft.title || draft.text?.slice(0, 120) || 'Editorial concept image'
+  const [prompt, setPrompt] = useState(defaultPrompt)
+  const [style, setStyle] = useState('minimal editorial, premium SaaS visual, high contrast')
+  const [aspectRatio, setAspectRatio] = useState('1:1')
+  const [error, setError] = useState('')
+  const { data: assets = [], isLoading } = useMediaAssets(draft.id)
+  const { mutateAsync: generateImage, isPending } = useGenerateImage(draft.id)
+  const imageAssets = assets.filter((asset) => asset.type === 'image' || asset.type === 'carousel_image')
+
+  const handleGenerate = async () => {
+    setError('')
+    try {
+      await generateImage({
+        prompt,
+        style: style || undefined,
+        aspect_ratio: aspectRatio,
+      })
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Image generation failed.')
+    }
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="font-semibold text-base">Media</h3>
+          <div className="text-[12px] text-tx3 mt-1">
+            {imageAssets.length} asset{imageAssets.length !== 1 ? 's' : ''}
+          </div>
+        </div>
+        {isLoading && <Spinner size={16} />}
+      </div>
+
+      <div className="flex flex-col gap-3 mb-5">
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          rows={3}
+          className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm text-tx placeholder:text-tx4 outline-none focus:border-border2 transition-colors resize-none"
+          placeholder="Image prompt"
+        />
+        <input
+          value={style}
+          onChange={(e) => setStyle(e.target.value)}
+          className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm text-tx placeholder:text-tx4 outline-none focus:border-border2 transition-colors"
+          placeholder="Style"
+        />
+        <div className="flex gap-2">
+          {['1:1', '4:5', '16:9', '9:16'].map((ratio) => (
+            <button
+              key={ratio}
+              onClick={() => setAspectRatio(ratio)}
+              className={`h-8 px-3 rounded-pill text-xs font-mono border transition-all ${
+                aspectRatio === ratio
+                  ? 'bg-tx text-bg border-tx'
+                  : 'border-border2 text-tx2 hover:bg-surface2'
+              }`}
+            >
+              {ratio}
+            </button>
+          ))}
+        </div>
+        <button
+          className="flex items-center justify-center gap-2 h-10 rounded-pill bg-tx text-bg font-semibold text-sm hover:bg-tx/90 transition-all disabled:opacity-50"
+          onClick={handleGenerate}
+          disabled={isPending || !prompt.trim()}
+        >
+          {isPending ? <Spinner size={14} /> : <Icon name="image" size={14} />}
+          {isPending ? 'Generating…' : 'Generate Image'}
+        </button>
+        {error && (
+          <div className="px-3 py-2 border border-red-900/50 bg-red-900/10 rounded-lg text-red-400 text-xs">
+            {error}
+          </div>
+        )}
+      </div>
+
+      {imageAssets.length > 0 ? (
+        <div className="grid grid-cols-2 gap-3">
+          {imageAssets.map((asset) => (
+            <MediaThumb key={asset.id} asset={asset} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-8 text-center border border-border rounded-xl text-tx3 text-sm">
+          No media yet.
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MediaThumb({ asset }: { asset: MediaRead }) {
+  const src = assetUrl(asset.file_url)
+  return (
+    <a
+      href={src || undefined}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block border border-border rounded-xl overflow-hidden bg-surface2 hover:border-border2 transition-colors"
+    >
+      {src ? (
+        <img src={src} alt="" className="w-full aspect-square object-cover bg-bg" />
+      ) : (
+        <div className="w-full aspect-square flex items-center justify-center text-tx3">
+          <Icon name="image" size={22} />
+        </div>
+      )}
+      <div className="px-3 py-2 text-[11px] font-mono text-tx3 truncate">
+        {String(asset.meta?.aspect_ratio ?? asset.type)} · {asset.status}
+      </div>
+    </a>
   )
 }
 

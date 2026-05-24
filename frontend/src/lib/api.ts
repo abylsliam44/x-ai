@@ -6,6 +6,7 @@ import type {
   FactCheckResponse,
   GenerateAnglesResponse,
   HealthResponse,
+  MediaRead,
   Page,
   ProjectCreate,
   ProjectRead,
@@ -18,8 +19,16 @@ import type {
   XStatusResponse,
 } from '../types/models'
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? ''
+const rawBase = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '')
+const BASE = rawBase.endsWith('/api') ? rawBase.slice(0, -4) : rawBase
 const API = `${BASE}/api/v1`
+
+export function assetUrl(url: string | null | undefined): string {
+  if (!url) return ''
+  if (/^https?:\/\//i.test(url)) return url
+  if (url.startsWith('/static/') && BASE) return `${BASE}${url}`
+  return url
+}
 
 function getToken(): string | null {
   return localStorage.getItem('token')
@@ -103,6 +112,27 @@ export const health = {
   get: () => request<HealthResponse>('/health'),
 }
 
+// ── Media ─────────────────────────────────────────────────────────────
+
+export const media = {
+  list: (draftId?: string, limit = 50) => {
+    const params = new URLSearchParams({ limit: String(limit) })
+    if (draftId) params.set('draft_id', draftId)
+    return request<MediaRead[]>(`/media?${params.toString()}`)
+  },
+
+  generateImage: (data: {
+    draft_id?: string
+    prompt: string
+    style?: string
+    aspect_ratio?: string
+  }) =>
+    request<MediaRead>('/media/generate-image', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+}
+
 // ── Projects ──────────────────────────────────────────────────────────
 
 export const projects = {
@@ -138,10 +168,18 @@ export const projects = {
     type: DraftType,
     angle?: AngleOption,
     additional_instructions?: string,
+    include_media = false,
+    media_preferences?: Record<string, unknown>,
   ) =>
     request<DraftRead>(`/projects/${id}/generate-draft`, {
       method: 'POST',
-      body: JSON.stringify({ type, angle, additional_instructions }),
+      body: JSON.stringify({
+        type,
+        angle,
+        additional_instructions,
+        include_media,
+        media_preferences,
+      }),
     }),
 
   traces: (id: string, limit = 50) =>

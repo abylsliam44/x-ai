@@ -7,7 +7,11 @@ from app.providers.media.mock_provider import MockAudioProvider, MockImageProvid
 
 @lru_cache
 def get_image_provider() -> ImageProvider:
-    if settings.MOCK_MODE or not settings.ENABLE_REAL_MEDIA_GENERATION or settings.DEFAULT_IMAGE_PROVIDER == "mock":
+    if (
+        settings.MOCK_MODE
+        or not settings.real_image_generation_enabled
+        or settings.DEFAULT_IMAGE_PROVIDER == "mock"
+    ):
         return MockImageProvider()
     from app.providers.media.image_provider import OpenAIImageProvider
 

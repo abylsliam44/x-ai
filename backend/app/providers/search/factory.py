@@ -9,6 +9,10 @@ from app.providers.search.mock_provider import MockWebSearchProvider, MockXSearc
 def get_web_search_provider() -> SearchProvider:
     if settings.MOCK_MODE or not settings.ENABLE_REAL_WEB_SEARCH or settings.DEFAULT_SEARCH_PROVIDER == "mock":
         return MockWebSearchProvider()
+    if settings.DEFAULT_SEARCH_PROVIDER == "openai":
+        from app.providers.search.web_search_provider import OpenAIWebSearchProvider
+
+        return OpenAIWebSearchProvider()
     from app.providers.search.web_search_provider import TavilyWebSearchProvider
 
     return TavilyWebSearchProvider()
@@ -16,7 +20,7 @@ def get_web_search_provider() -> SearchProvider:
 
 @lru_cache
 def get_x_search_provider() -> SearchProvider:
-    if settings.MOCK_MODE or not settings.ENABLE_REAL_X_API:
+    if settings.MOCK_MODE or not settings.ENABLE_REAL_X_SEARCH:
         return MockXSearchProvider()
     from app.providers.search.x_search_provider import XSearchProvider
 

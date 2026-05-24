@@ -46,12 +46,16 @@ export function useGenerateDraft(projectId: string | undefined) {
       type,
       angle,
       instructions,
+      includeMedia,
+      mediaPreferences,
     }: {
       type: DraftType
       angle?: AngleOption
       instructions?: string
+      includeMedia?: boolean
+      mediaPreferences?: Record<string, unknown>
     }) =>
-      projects.generateDraft(projectId!, type, angle, instructions),
+      projects.generateDraft(projectId!, type, angle, instructions, includeMedia, mediaPreferences),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['project', projectId] })
     },

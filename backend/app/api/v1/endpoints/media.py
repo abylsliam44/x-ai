@@ -1,8 +1,10 @@
 import uuid
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
+from sqlalchemy import select
 
 from app.api.deps import CurrentUserDep, SessionDep
+from app.models.media_asset import MediaAsset
 from app.schemas.media import (
     GenerateCarouselRequest,
     GenerateImageRequest,
@@ -13,6 +15,25 @@ from app.schemas.media import (
 from app.services.media_service import MediaService
 
 router = APIRouter(prefix="/media", tags=["media"])
+
+
+@router.get("", response_model=list[MediaRead])
+async def list_media(
+    user: CurrentUserDep,
+    session: SessionDep,
+    draft_id: uuid.UUID | None = Query(default=None),
+    limit: int = Query(50, ge=1, le=100),
+) -> list[MediaRead]:
+    stmt = (
+        select(MediaAsset)
+        .where(MediaAsset.user_id == user.id)
+        .order_by(MediaAsset.created_at.desc())
+        .limit(limit)
+    )
+    if draft_id:
+        stmt = stmt.where(MediaAsset.draft_id == draft_id)
+    rows = (await session.execute(stmt)).scalars().all()
+    return [MediaRead.model_validate(row) for row in rows]
 
 
 @router.post("/generate-image", response_model=MediaRead, status_code=status.HTTP_201_CREATED)

@@ -18,6 +18,7 @@ from app.core.security import (
 )
 from app.models.draft import Draft
 from app.models.media_asset import MediaAsset
+from app.services.storage_service import StorageService
 from app.models.x_account import XAccount
 
 logger = get_logger(__name__)
@@ -282,7 +283,7 @@ class XService:
                 logger.warning("x.media_upload.missing_file_url", extra={"asset_id": str(asset.id)})
                 continue
 
-            if asset.type == "image":
+            if asset.type in ("image", "carousel_image"):
                 if not settings.X_ENABLE_REAL_IMAGE_UPLOAD:
                     raise ProviderError(
                         "Real X image upload is not enabled "
@@ -291,13 +292,15 @@ class XService:
                     )
                 # Image upload — simple form-data upload to legacy v1.1 endpoint.
                 media_id = await self._upload_image_asset(access_token, asset)
-            elif asset.type in ("video", "audio"):
+            elif asset.type in ("video", "audio", "gif"):
                 if not settings.X_ENABLE_REAL_VIDEO_UPLOAD:
                     raise ProviderError(
-                        "Real X video upload is not enabled "
+                        "Real X video/GIF upload is not enabled "
                         "(X_ENABLE_REAL_VIDEO_UPLOAD=false). "
                         "Text-only publishing is available."
                     )
+                if asset.type == "gif":
+                    raise ProviderError("Real X GIF upload is not implemented in this MVP build.")
                 media_id = await self._upload_video_asset_chunked(access_token, asset)
             else:
                 logger.warning(
@@ -312,11 +315,9 @@ class XService:
 
     async def _upload_image_asset(self, access_token: str, asset: MediaAsset) -> str:
         """Upload a single image to X media upload endpoint (simple upload)."""
-        import aiofiles
-
-        file_path = asset.file_url.lstrip("/")
-        async with aiofiles.open(file_path, "rb") as f:
-            data = await f.read()
+        if not asset.storage_key:
+            raise ProviderError(f"Cannot upload image asset {asset.id}: storage_key is missing")
+        data = await StorageService().get_bytes(asset.storage_key)
 
         async with httpx.AsyncClient(timeout=60) as client:
             response = await client.post(

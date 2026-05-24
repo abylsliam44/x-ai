@@ -61,7 +61,7 @@ services:
                --access-logfile -
                --error-logfile -"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -128,7 +128,7 @@ services:
       - ./frontend/dist:/usr/share/nginx/html:ro
       - nginx_logs:/var/log/nginx
       - certbot_certs:/etc/letsencrypt:ro
-      - certbot_www:/var/www/certbot:ro
+      - certbot_www:/var/www/certbot
     depends_on:
       - backend
     networks:
@@ -138,6 +138,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  certbot:
+    image: certbot/certbot:latest
+    profiles: ["ssl"]
+    volumes:
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    networks:
+      - public
 
 volumes:
   postgres_data:
