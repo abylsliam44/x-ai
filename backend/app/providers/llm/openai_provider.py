@@ -25,11 +25,10 @@ class OpenAIProvider(LLMProvider):
 
         client_kwargs: dict[str, Any] = {
             "api_key": settings.OPENAI_API_KEY,
+            "base_url": settings.OPENAI_BASE_URL or "https://api.openai.com/v1",
             "max_retries": settings.OPENAI_MAX_RETRIES,
             "timeout": float(settings.OPENAI_TIMEOUT_SECONDS),
         }
-        if settings.OPENAI_BASE_URL:
-            client_kwargs["base_url"] = settings.OPENAI_BASE_URL
         if settings.OPENAI_ORG_ID:
             client_kwargs["organization"] = settings.OPENAI_ORG_ID
         if settings.OPENAI_PROJECT_ID:

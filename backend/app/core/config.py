@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import List, Literal, Optional
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -182,11 +182,27 @@ class Settings(BaseSettings):
     # Startup validation
     # ------------------------------------------------------------------
 
+    @field_validator("OPENAI_BASE_URL", mode="before")
+    @classmethod
+    def _normalise_openai_base_url(cls, value: object) -> object:
+        if isinstance(value, str):
+            cleaned = value.strip().strip('"').strip("'")
+            if not cleaned:
+                return None
+            return cleaned
+        return value
+
     @model_validator(mode="after")
     def _validate_real_mode(self) -> "Settings":
         if self.MOCK_MODE:
             # Mock mode: no secrets required — always valid.
             return self
+
+        if self.OPENAI_BASE_URL and not self.OPENAI_BASE_URL.startswith(("http://", "https://")):
+            raise ValueError(
+                "OPENAI_BASE_URL must start with http:// or https://. "
+                "Leave it empty to use https://api.openai.com/v1."
+            )
 
         if self.DEFAULT_LLM_PROVIDER == "openai" and not self.OPENAI_API_KEY:
             raise ValueError(
