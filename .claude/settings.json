@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /pkg/env/global/bin/ | head -30)",
+      "Read(//pkg/env/global/**)",
+      "Bash(/usr/local/bin/node --version)",
+      "Bash(/opt/homebrew/bin/node --version)",
+      "Bash(/usr/bin/node --version)",
+      "Bash(PATH=/opt/homebrew/bin:/usr/local/bin:__TRACKED_VAR__ which node)"
+    ]
+  }
+}

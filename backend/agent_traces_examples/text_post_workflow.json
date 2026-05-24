@@ -1,0 +1,135 @@
+{
+  "workflow": "text_post",
+  "project": {
+    "topic": "AI coding agents and the future of software engineering",
+    "goal": "Build authority",
+    "target_audience": "Senior engineers and engineering leaders on X"
+  },
+  "traces": [
+    {
+      "agent": "research_agent",
+      "step": "research",
+      "model": "research",
+      "latency_ms": 380,
+      "output": {
+        "results": [
+          {"title": "State of AI coding in 2026", "url": "https://example.com/a", "score": 0.82},
+          {"title": "Practitioner field notes", "url": "https://example.com/b", "score": 0.74}
+        ]
+      }
+    },
+    {
+      "agent": "retrieval_agent",
+      "step": "retrieval",
+      "model": "retrieval",
+      "latency_ms": 110,
+      "output": {
+        "chunks": [
+          {"text": "Engineers report a shift from typing to specifying.", "score": 0.71}
+        ]
+      }
+    },
+    {
+      "agent": "insight_agent",
+      "step": "insights",
+      "model": "mock-llm-1",
+      "tokens_input": 312,
+      "tokens_output": 240,
+      "latency_ms": 920,
+      "output": {
+        "insights": [
+          {
+            "insight": "Code generation is solved; engineering judgment is the new bottleneck.",
+            "why_it_matters": "Hiring, review processes, and code ownership all rebuild around judgment, not throughput.",
+            "evidence_refs": ["research_agent#0", "retrieval_agent#0"]
+          }
+        ]
+      }
+    },
+    {
+      "agent": "angle_agent",
+      "step": "angles",
+      "model": "mock-llm-1",
+      "latency_ms": 800,
+      "output": {
+        "angles": [
+          {
+            "title": "Judgment is the new bottleneck",
+            "thesis": "AI agents make implementation cheap. The scarce skill is deciding what should exist and what should not.",
+            "hook": "Code generation is solved. Knowing what to build still is not.",
+            "rationale": "Contrarian, defensible, ladders into a strong specific claim."
+          }
+        ]
+      }
+    },
+    {
+      "agent": "outline_agent",
+      "step": "outline",
+      "model": "mock-llm-1",
+      "latency_ms": 410,
+      "output": {
+        "outline": [
+          {"section": "Hook", "beats": ["Code generation is solved"]},
+          {"section": "Tension", "beats": ["The bottleneck moved"]},
+          {"section": "Resolution", "beats": ["Engineering judgment is the new edge"]}
+        ]
+      }
+    },
+    {
+      "agent": "draft_writer_agent",
+      "step": "draft",
+      "model": "mock-llm-1",
+      "tokens_input": 540,
+      "tokens_output": 180,
+      "latency_ms": 1200,
+      "output": {
+        "type": "text_post",
+        "text": "Code generation is solved. Engineering judgment still is not.\n\nThe best engineers in 2026 are the people who can frame the right problem, constrain the agent, and notice when the answer is subtly wrong."
+      }
+    },
+    {
+      "agent": "fact_checker_agent",
+      "step": "fact_check",
+      "model": "fact-check",
+      "latency_ms": 640,
+      "output": {
+        "overall_score": 0.83,
+        "items": [
+          {
+            "claim": "Code generation is solved.",
+            "verdict": "weakly_supported",
+            "confidence": 0.55,
+            "evidence": [{"source": "research_agent", "summary": "Industry signal but no formal benchmark"}],
+            "suggested_fix": "Reframe as 'commodity' rather than 'solved'."
+          }
+        ]
+      }
+    },
+    {
+      "agent": "style_reviewer_agent",
+      "step": "style",
+      "model": "style",
+      "latency_ms": 220,
+      "output": {"score": 0.78, "notes": "Voice is sharp. Trim adverbs in the second sentence."}
+    },
+    {
+      "agent": "editor_agent",
+      "step": "edit",
+      "model": "mock-llm-1",
+      "latency_ms": 360,
+      "output": {
+        "applied": true,
+        "revision": {
+          "text": "Code generation is becoming a commodity. Engineering judgment is not.\n\nThe best engineers in 2026 frame the right problem, constrain the agent, and catch the answers that are subtly wrong."
+        }
+      }
+    }
+  ],
+  "final_draft": {
+    "type": "text_post",
+    "text": "Code generation is becoming a commodity. Engineering judgment is not.\n\nThe best engineers in 2026 frame the right problem, constrain the agent, and catch the answers that are subtly wrong.",
+    "quality_score": 0.81,
+    "fact_check_score": 0.83,
+    "style_score": 0.78
+  }
+}

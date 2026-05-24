@@ -1,0 +1,57 @@
+{
+  "workflow": "voice_video_post",
+  "project": {
+    "topic": "What 'taste' actually means for AI builders",
+    "goal": "Build authority",
+    "target_audience": "Founders and ML engineers"
+  },
+  "traces": [
+    {"agent": "research_agent", "step": "research", "latency_ms": 360, "output": {"results": [{"title": "Taste in AI products", "score": 0.72}]}},
+    {"agent": "retrieval_agent", "step": "retrieval", "latency_ms": 80, "output": {"chunks": [{"text": "Taste shows up in the friction users do not feel.", "score": 0.69}]}},
+    {"agent": "insight_agent", "step": "insights", "latency_ms": 820, "output": {"insights": [{"insight": "Taste is the cumulative result of small rejections, not a single grand decision.", "why_it_matters": "It is teachable through reviews, not through inspiration."}]}},
+    {"agent": "angle_agent", "step": "angles", "latency_ms": 690, "output": {"angles": [{"title": "Taste is a rejection muscle", "thesis": "Taste is what you say no to."}]}},
+    {"agent": "outline_agent", "step": "outline", "latency_ms": 260, "output": {"outline": [{"section": "Hook", "beats": ["Open with a strong line"]}, {"section": "Body", "beats": ["Examples", "Counterexamples"]}, {"section": "Close", "beats": ["Memorable takeaway"]}]}},
+    {
+      "agent": "draft_writer_agent",
+      "step": "draft",
+      "latency_ms": 1100,
+      "output": {
+        "type": "voice_video_post",
+        "text": "Taste in AI is not what you build. It is what you refuse to ship.\n\nThe systems that feel good are the ones where someone, in some review, said: 'not this'. Over and over. Until what remained was small, clear, and honest."
+      }
+    },
+    {"agent": "fact_checker_agent", "step": "fact_check", "latency_ms": 410, "output": {"overall_score": 0.92, "items": []}},
+    {"agent": "style_reviewer_agent", "step": "style", "latency_ms": 200, "output": {"score": 0.81, "notes": "Strong opening. Punchier middle would help."}},
+    {"agent": "editor_agent", "step": "edit", "latency_ms": 320, "output": {"applied": true, "revision": {"text": "Taste is not what you build. It is what you refuse to ship.\n\nThe systems that feel good are the ones where someone said 'not this'. Again and again, until what was left was small, clear, and honest."}}},
+    {
+      "agent": "media_director_agent",
+      "step": "media_plan",
+      "latency_ms": 280,
+      "output": {
+        "media_plan": [
+          {
+            "type": "voice_video",
+            "prompt": "Taste is not what you build. It is what you refuse to ship.",
+            "aspect_ratio": "9:16",
+            "notes": "Calm, confident narration over a dark minimal background with captions"
+          }
+        ]
+      }
+    }
+  ],
+  "media_assets": [
+    {
+      "type": "video",
+      "kind": "voice_video",
+      "duration_seconds": 18.4,
+      "width": 1080,
+      "height": 1920,
+      "mime_type": "video/mp4",
+      "captions": [
+        "Taste is not what you build",
+        "It is what you refuse to ship",
+        "Someone said: not this. Again and again."
+      ]
+    }
+  ]
+}

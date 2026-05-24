@@ -1,0 +1,48 @@
+{
+  "workflow": "thread",
+  "project": {
+    "topic": "Why most AI features ship as demos and never become real products",
+    "goal": "Build authority",
+    "target_audience": "Product builders and startup founders"
+  },
+  "traces": [
+    {"agent": "research_agent", "step": "research", "latency_ms": 410, "output": {"results": [{"title": "AI demo death valley", "score": 0.79}]}},
+    {"agent": "retrieval_agent", "step": "retrieval", "latency_ms": 90, "output": {"chunks": [{"text": "Teams underinvest in evaluation harnesses.", "score": 0.74}]}},
+    {"agent": "insight_agent", "step": "insights", "latency_ms": 880, "output": {"insights": [{"insight": "Demos optimize for a single happy path; products require tail behavior to be acceptable.", "why_it_matters": "Tail behavior is what users hit on day three.", "evidence_refs": ["retrieval_agent#0"]}]}},
+    {"agent": "angle_agent", "step": "angles", "latency_ms": 720, "output": {"angles": [{"title": "Demos are not products", "thesis": "AI features die when teams ship demos and stop building once the gif looks good.", "hook": "Most AI features die at the demo line."}]}},
+    {"agent": "outline_agent", "step": "outline", "latency_ms": 320, "output": {"outline": [{"section": "Tweet 1", "beats": ["Open with the death rate"]}, {"section": "Tweet 2", "beats": ["Why demos look complete"]}, {"section": "Tweet 3", "beats": ["What products do differently"]}, {"section": "Tweet 4", "beats": ["Concrete rule"]}, {"section": "Tweet 5", "beats": ["Final crisp claim"]}]}},
+    {
+      "agent": "draft_writer_agent",
+      "step": "draft",
+      "tokens_input": 720,
+      "tokens_output": 360,
+      "latency_ms": 1380,
+      "output": {
+        "type": "thread",
+        "thread_items": [
+          {"index": 1, "text": "Most AI features die at the demo line. The gif looks good, the launch tweet ships, and the feature quietly stops mattering."},
+          {"index": 2, "text": "Demos optimize one happy path. Products survive the long tail: weird inputs, unclear intent, partial answers."},
+          {"index": 3, "text": "Real AI products look boring from the outside: evaluation harnesses, retry logic, fallbacks, escalation rules, and a humble UI that admits failure."},
+          {"index": 4, "text": "A simple rule: if the only screenshot of the feature is its best case, you have a demo. If you can show the third worst case and explain how the system behaves, you have a product."},
+          {"index": 5, "text": "The bar for AI features in 2026 is not 'can it impress'. It is 'can it be relied on'. That is a different engineering problem."}
+        ]
+      }
+    },
+    {"agent": "fact_checker_agent", "step": "fact_check", "latency_ms": 520, "output": {"overall_score": 0.86, "items": [{"claim": "Most AI features die at the demo line.", "verdict": "weakly_supported", "confidence": 0.55, "suggested_fix": "Soften to 'many'"}]}},
+    {"agent": "style_reviewer_agent", "step": "style", "latency_ms": 180, "output": {"score": 0.84, "notes": "Cadence is good. Tweet 3 could lose one clause."}},
+    {"agent": "editor_agent", "step": "edit", "latency_ms": 410, "output": {"applied": true, "revision": {"thread_items": [{"index": 1, "text": "Many AI features die at the demo line. The gif looks good, the launch tweet ships, and the feature quietly stops mattering."}]}}}
+  ],
+  "final_draft": {
+    "type": "thread",
+    "thread_items": [
+      {"index": 1, "text": "Many AI features die at the demo line. The gif looks good, the launch tweet ships, and the feature quietly stops mattering."},
+      {"index": 2, "text": "Demos optimize one happy path. Products survive the long tail: weird inputs, unclear intent, partial answers."},
+      {"index": 3, "text": "Real AI products look boring from the outside: evaluation harnesses, retry logic, fallbacks, escalation rules, and a UI that admits failure."},
+      {"index": 4, "text": "A simple rule: if the only screenshot is the best case, you have a demo. If you can show the third worst case, you have a product."},
+      {"index": 5, "text": "The bar for AI features in 2026 is not 'can it impress'. It is 'can it be relied on'."}
+    ],
+    "quality_score": 0.85,
+    "fact_check_score": 0.86,
+    "style_score": 0.84
+  }
+}
