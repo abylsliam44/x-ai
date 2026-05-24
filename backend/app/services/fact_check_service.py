@@ -95,7 +95,11 @@ class FactCheckService:
             if verdict not in VERDICT_WEIGHTS:
                 verdict = "unverifiable"
             confidence = float(raw.get("confidence", 0.5))
-            evidence = raw.get("evidence") or []
+            raw_evidence = raw.get("evidence") or []
+            evidence = [
+                e if isinstance(e, dict) else {"text": str(e)}
+                for e in raw_evidence
+            ]
             suggested_fix = raw.get("suggested_fix")
             self.session.add(
                 FactCheck(

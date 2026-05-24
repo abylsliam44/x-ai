@@ -67,7 +67,7 @@ class PublishService:
         except Exception as exc:
             job.status = "failed"
             job.error_message = str(exc)
-            draft.status = "failed"
+            draft.status = "approved"  # revert so user can retry or revise
             await self.session.flush()
             return job
 
