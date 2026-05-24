@@ -57,8 +57,9 @@ class OpenAIProvider(LLMProvider):
         }
         if _supports_custom_temperature(resolved_model):
             kwargs["temperature"] = temperature
-        token_param = "max_completion_tokens" if _uses_max_completion_tokens(resolved_model) else "max_tokens"
-        kwargs[token_param] = capped_tokens
+        kwargs["max_completion_tokens"] = capped_tokens
+        if _supports_reasoning_effort(resolved_model):
+            kwargs["extra_body"] = {"reasoning_effort": settings.OPENAI_REASONING_EFFORT}
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
 
@@ -130,22 +131,27 @@ class OpenAIProvider(LLMProvider):
         *,
         model: Optional[str] = None,
         size: str = "1024x1024",
-        quality: str = "standard",
+        quality: str = "auto",
         n: int = 1,
     ) -> list[str]:
-        """Return a list of image URLs."""
+        """Return generated images as URLs or data URLs."""
         from openai import APIStatusError
 
         resolved_model = model or settings.OPENAI_IMAGE_MODEL
+        image_kwargs: dict[str, Any] = {
+            "model": resolved_model,
+            "prompt": prompt,
+            "size": size,
+            "quality": quality,
+            "n": n,
+        }
+        if _is_gpt_image_model(resolved_model):
+            image_kwargs["extra_body"] = {"output_format": "png"}
+        else:
+            image_kwargs["response_format"] = "url"
+
         try:
-            response = await self._client.images.generate(
-                model=resolved_model,
-                prompt=prompt,
-                size=size,  # type: ignore[arg-type]
-                quality=quality,  # type: ignore[arg-type]
-                n=n,
-                response_format="url",
-            )
+            response = await self._client.images.generate(**image_kwargs)
         except APIStatusError as exc:
             raise ProviderError(
                 f"OpenAI image generation failed ({exc.status_code}): {exc.message}"
@@ -153,7 +159,16 @@ class OpenAIProvider(LLMProvider):
         except Exception as exc:
             raise ProviderError(f"OpenAI image generation failed: {exc}") from exc
 
-        return [item.url for item in response.data if item.url]
+        images: list[str] = []
+        for item in response.data:
+            if getattr(item, "url", None):
+                images.append(item.url)
+                continue
+            b64_json = getattr(item, "b64_json", None)
+            if b64_json:
+                output_format = getattr(item, "output_format", None) or "png"
+                images.append(f"data:image/{output_format};base64,{b64_json}")
+        return images
 
     async def transcribe_audio(
         self,
@@ -210,7 +225,7 @@ class OpenAIProvider(LLMProvider):
             raise ProviderError(f"OpenAI TTS failed: {exc}") from exc
 
 
-def _uses_max_completion_tokens(model: str) -> bool:
+def _supports_reasoning_effort(model: str) -> bool:
     normalized = model.lower()
     return normalized.startswith(("gpt-5", "o1", "o3", "o4"))
 
@@ -218,3 +233,7 @@ def _uses_max_completion_tokens(model: str) -> bool:
 def _supports_custom_temperature(model: str) -> bool:
     normalized = model.lower()
     return not normalized.startswith(("gpt-5", "o1", "o3", "o4"))
+
+
+def _is_gpt_image_model(model: str) -> bool:
+    return model.lower().startswith("gpt-image")

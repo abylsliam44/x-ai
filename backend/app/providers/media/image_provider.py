@@ -33,6 +33,9 @@ class OpenAIImageProvider(ImageProvider):
             "size": size,
             "n": 1,
         }
+        if settings.OPENAI_IMAGE_MODEL.lower().startswith("gpt-image"):
+            payload["quality"] = "auto"
+            payload["output_format"] = "png"
         headers = {
             "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
             "Content-Type": "application/json",

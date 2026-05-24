@@ -32,7 +32,11 @@ class OpenAIWebSearchProvider(SearchProvider):
                     "search_context_size": settings.OPENAI_WEB_SEARCH_CONTEXT_SIZE,
                 }
             ],
+            "tool_choice": "required",
+            "include": ["web_search_call.action.sources"],
         }
+        if _supports_reasoning_effort(settings.OPENAI_WEB_SEARCH_MODEL):
+            payload["reasoning"] = {"effort": settings.OPENAI_REASONING_EFFORT}
         headers = {
             "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
             "Content-Type": "application/json",
@@ -158,3 +162,8 @@ def _snippet_from_text(
     if start < 0 or end <= start or start >= len(text):
         return text[:320]
     return text[start:min(end, len(text))].strip() or text[:320]
+
+
+def _supports_reasoning_effort(model: str) -> bool:
+    normalized = model.lower()
+    return normalized.startswith(("gpt-5", "o1", "o3", "o4"))

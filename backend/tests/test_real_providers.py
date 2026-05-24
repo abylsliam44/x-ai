@@ -49,6 +49,7 @@ def _fake_settings(**overrides):
         "OPENAI_ORG_ID": None,
         "OPENAI_PROJECT_ID": None,
         "OPENAI_TIMEOUT_SECONDS": 10,
+        "OPENAI_REASONING_EFFORT": "low",
         "OPENAI_WEB_SEARCH_MODEL": "gpt-5.4-mini",
         "OPENAI_WEB_SEARCH_CONTEXT_SIZE": "low",
         "OPENAI_IMAGE_MODEL": "gpt-image-2",
@@ -114,6 +115,10 @@ async def test_openai_web_search_parses_and_dedupes_citations(monkeypatch):
     assert results[0].title == "Alpha"
     assert "Alpha source" in results[0].snippet
     assert FakeAsyncClient.posts[0][0] == "https://api.openai.com/v1/responses"
+    payload = FakeAsyncClient.posts[0][1]["json"]
+    assert payload["tools"][0]["type"] == "web_search"
+    assert payload["tool_choice"] == "required"
+    assert payload["reasoning"] == {"effort": "low"}
 
 
 @pytest.mark.asyncio
@@ -160,6 +165,9 @@ async def test_openai_image_provider_decodes_b64(monkeypatch):
     assert result.binary == image_bytes
     assert result.mime_type == "image/png"
     assert (result.width, result.height) == (1024, 1024)
+    payload = FakeAsyncClient.posts[-1][1]["json"]
+    assert payload["output_format"] == "png"
+    assert payload["quality"] == "auto"
 
 
 @pytest.mark.asyncio

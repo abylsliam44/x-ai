@@ -68,7 +68,7 @@ class Settings(BaseSettings):
     OPENAI_TIMEOUT_SECONDS: int = 60
     OPENAI_MAX_RETRIES: int = 3
     OPENAI_MAX_OUTPUT_TOKENS: int = 4000
-    OPENAI_REASONING_EFFORT: str = "medium"
+    OPENAI_REASONING_EFFORT: Literal["none", "minimal", "low", "medium", "high", "xhigh"] = "medium"
     OPENAI_ENABLE_WEB_SEARCH: bool = False
     OPENAI_WEB_SEARCH_MODEL: str = "gpt-5.4-mini"
     OPENAI_WEB_SEARCH_CONTEXT_SIZE: Literal["low", "medium", "high"] = "low"
