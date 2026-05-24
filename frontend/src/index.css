@@ -159,3 +159,77 @@ html, body, #root {
   height: 1px;
   background: #fff;
 }
+
+/* ── New animation keyframes ───────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes checkReveal {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60%  { transform: scale(1.3) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg);  opacity: 1; }
+}
+
+@keyframes agentRing {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.25); }
+  50%       { box-shadow: 0 0 0 5px rgba(255,255,255,0); }
+}
+
+@keyframes progressFillV {
+  from { height: 0%; }
+  to   { height: 100%; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Agent pipeline styles */
+.agent-step-enter {
+  animation: slideInLeft 0.35s cubic-bezier(.2,.9,.3,1) both;
+}
+
+.agent-check {
+  animation: checkReveal 0.4s cubic-bezier(.2,.9,.3,1) both;
+}
+
+.agent-active-ring {
+  animation: agentRing 1.8s ease-in-out infinite;
+}
+
+.slide-up {
+  animation: slideUp 0.4s cubic-bezier(.2,.9,.3,1) both;
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--surface) 25%,
+    var(--surface-2) 50%,
+    var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* Stat card counter */
+.stat-count {
+  animation: countUp 0.5s cubic-bezier(.2,.9,.3,1) both;
+}
+
+/* Pipeline vertical fill */
+.pipeline-fill-anim {
+  animation: progressFillV 0.5s ease forwards;
+}

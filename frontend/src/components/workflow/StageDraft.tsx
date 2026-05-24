@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Icon } from '../common/Icon'
 import { Spinner } from '../common/Spinner'
 import { FactCheckPanel } from '../drafts/FactCheckPanel'
@@ -360,28 +360,247 @@ function PostItem({ index, text, total, isThread }: { index: number; text: strin
   )
 }
 
+const AGENT_PIPELINE = [
+  {
+    name: 'Research Agent',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+      </svg>
+    ),
+    desc: 'Scanning web sources and uploaded documents…',
+  },
+  {
+    name: 'Retrieval Agent',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    ),
+    desc: 'Ranking and filtering context by relevance…',
+  },
+  {
+    name: 'Insight Agent',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/>
+      </svg>
+    ),
+    desc: 'Extracting non-obvious, evidence-backed claims…',
+  },
+  {
+    name: 'Angle Agent',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="20" r="2"/>
+        <path d="M6 8v3a2 2 0 002 2h8a2 2 0 002-2V8M12 13v5"/>
+      </svg>
+    ),
+    desc: 'Generating strategic framings of the topic…',
+  },
+  {
+    name: 'Outline Agent',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+      </svg>
+    ),
+    desc: 'Structuring the argument and post flow…',
+  },
+  {
+    name: 'Draft Writer',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M3 21l4-1 12-12-3-3L4 17z"/>
+      </svg>
+    ),
+    desc: 'Writing in your brand voice with citations…',
+  },
+  {
+    name: 'Fact Checker',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <polyline points="4 12 10 18 20 6"/>
+      </svg>
+    ),
+    desc: 'Verifying each claim against research sources…',
+  },
+  {
+    name: 'Style Reviewer',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/>
+      </svg>
+    ),
+    desc: 'Checking tone, cadence, and voice alignment…',
+  },
+  {
+    name: 'Editor',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+      </svg>
+    ),
+    desc: 'Sharpening hook, rhythm, and removing AI phrasing…',
+  },
+]
+
+// Approximate seconds each agent takes; used to pace the simulation
+const AGENT_DURATIONS = [6, 3, 4, 4, 3, 8, 5, 4, 3]
+
 function AgentProgressDisplay() {
-  const AGENTS = [
-    'Research Agent',
-    'Retrieval Agent',
-    'Insight Agent',
-    'Angle Agent',
-    'Outline Agent',
-    'Draft Writer',
-    'Fact Checker',
-    'Style Reviewer',
-    'Editor',
-  ]
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [doneMask, setDoneMask] = useState<boolean[]>(Array(AGENT_PIPELINE.length).fill(false))
+  const [elapsed, setElapsed] = useState<number[]>(Array(AGENT_PIPELINE.length).fill(0))
+  const startRef  = useRef<number[]>(Array(AGENT_PIPELINE.length).fill(0))
+  const timerIds  = useRef<ReturnType<typeof setTimeout>[]>([])
+
+  useEffect(() => {
+    let current = 0
+    let isMounted = true
+
+    function advance() {
+      if (!isMounted || current >= AGENT_PIPELINE.length) return
+      startRef.current[current] = Date.now()
+
+      // Tick elapsed time every 200 ms
+      const tickId = setInterval(() => {
+        if (!isMounted) { clearInterval(tickId); return }
+        const idx = current
+        setElapsed(prev => {
+          const next = [...prev]
+          next[idx] = (Date.now() - startRef.current[idx]) / 1000
+          return next
+        })
+      }, 200) as unknown as ReturnType<typeof setTimeout>
+      timerIds.current.push(tickId)
+
+      const stepMs = AGENT_DURATIONS[current] * 1000
+      const doneId = setTimeout(() => {
+        clearInterval(tickId as unknown as ReturnType<typeof setInterval>)
+        if (!isMounted) return
+        const finishedIdx = current
+        setDoneMask(prev => { const n = [...prev]; n[finishedIdx] = true; return n })
+        current += 1
+        if (current < AGENT_PIPELINE.length) setActiveIdx(current)
+        advance()
+      }, stepMs)
+      timerIds.current.push(doneId)
+    }
+
+    advance()
+
+    return () => {
+      isMounted = false
+      timerIds.current.forEach(id => {
+        clearTimeout(id)
+        clearInterval(id as unknown as ReturnType<typeof setInterval>)
+      })
+      timerIds.current = []
+    }
+  }, [])
+
   return (
-    <div className="py-8 flex flex-col items-center gap-6">
-      <Spinner size={24} />
-      <div className="flex flex-col gap-2 w-full max-w-xs">
-        {AGENTS.map((agent, i) => (
-          <div key={agent} className="flex items-center gap-3 text-sm">
-            <div className={`w-2 h-2 rounded-full shrink-0 ${i === 0 ? 'bg-tx animate-pulse' : 'bg-border2'}`} />
-            <span className={i === 0 ? 'text-tx' : 'text-tx4'}>{agent}</span>
+    <div className="my-6 rounded-2xl border border-border bg-surface overflow-hidden slide-up">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-surface2">
+        <div className="flex items-center gap-3">
+          <div className="relative w-4 h-4">
+            <div className="w-4 h-4 rounded-full border-2 border-border2 border-t-tx animate-spin" />
           </div>
-        ))}
+          <span className="font-mono text-[11px] text-tx2 tracking-[0.18em] uppercase">
+            Agent Pipeline · Running
+          </span>
+        </div>
+        <span className="font-mono text-[11px] text-tx4">
+          {activeIdx + 1} / {AGENT_PIPELINE.length}
+        </span>
+      </div>
+
+      {/* Steps */}
+      <div className="relative px-5 py-4">
+        {/* Vertical connector */}
+        <div
+          className="absolute left-[31px] top-4 bottom-4 w-px bg-border"
+          style={{ top: 28, bottom: 28 }}
+        />
+        {/* Progress fill */}
+        <div
+          className="absolute left-[31px] w-px bg-tx transition-all duration-700"
+          style={{
+            top: 28,
+            height: `${(activeIdx / Math.max(1, AGENT_PIPELINE.length - 1)) * (100 - 6)}%`,
+          }}
+        />
+
+        <div className="flex flex-col gap-0">
+          {AGENT_PIPELINE.map((agent, i) => {
+            const isDone   = doneMask[i]
+            const isActive = i === activeIdx && !isDone
+            const isPend   = i > activeIdx
+
+            return (
+              <div
+                key={agent.name}
+                className="relative flex items-start gap-4 py-[11px]"
+                style={{
+                  animationDelay: `${i * 0.05}s`,
+                }}
+              >
+                {/* Icon circle */}
+                <div
+                  className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center shrink-0 border transition-all duration-300 ${
+                    isDone
+                      ? 'bg-tx border-tx text-bg'
+                      : isActive
+                      ? 'bg-surface2 border-tx text-tx agent-active-ring'
+                      : 'bg-surface border-border text-tx4'
+                  }`}
+                >
+                  {isDone ? (
+                    <svg className="agent-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <polyline points="4 12 10 18 20 6"/>
+                    </svg>
+                  ) : (
+                    <span className={isActive ? 'text-tx' : ''}>{agent.icon}</span>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 pt-[3px]">
+                  <div className={`text-sm font-medium leading-snug transition-colors ${
+                    isDone ? 'text-tx2' : isActive ? 'text-tx' : 'text-tx4'
+                  }`}>
+                    {agent.name}
+                  </div>
+                  {isActive && (
+                    <div className="text-xs text-tx3 font-mono mt-0.5 agent-step-enter">
+                      {agent.desc}
+                    </div>
+                  )}
+                </div>
+
+                {/* Right: status / timing */}
+                <div className="shrink-0 text-right pt-[3px]">
+                  {isDone && (
+                    <span className="font-mono text-[11px] text-tx3 agent-step-enter">
+                      {elapsed[i] > 0 ? `${elapsed[i].toFixed(1)}s` : '—'}
+                    </span>
+                  )}
+                  {isActive && (
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-tx2 agent-step-enter">
+                      <span className="pulse-dot w-[5px] h-[5px]" />
+                      running
+                    </span>
+                  )}
+                  {isPend && (
+                    <span className="font-mono text-[10px] text-tx4">queued</span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

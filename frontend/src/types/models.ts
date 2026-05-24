@@ -107,6 +107,10 @@ export interface AngleOption {
   thesis: string
   hook: string
   rationale: string
+  score?: number | null
+  best_format?: string | null
+  contrarian_point?: string | null
+  risk_notes?: string | null
 }
 
 export interface GenerateAnglesResponse {
