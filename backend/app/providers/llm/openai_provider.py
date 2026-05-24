@@ -54,8 +54,9 @@ class OpenAIProvider(LLMProvider):
         kwargs: dict[str, Any] = {
             "model": resolved_model,
             "messages": [{"role": m.role, "content": m.content} for m in messages],
-            "temperature": temperature,
         }
+        if _supports_custom_temperature(resolved_model):
+            kwargs["temperature"] = temperature
         token_param = "max_completion_tokens" if _uses_max_completion_tokens(resolved_model) else "max_tokens"
         kwargs[token_param] = capped_tokens
         if json_mode:
@@ -212,3 +213,8 @@ class OpenAIProvider(LLMProvider):
 def _uses_max_completion_tokens(model: str) -> bool:
     normalized = model.lower()
     return normalized.startswith(("gpt-5", "o1", "o3", "o4"))
+
+
+def _supports_custom_temperature(model: str) -> bool:
+    normalized = model.lower()
+    return not normalized.startswith(("gpt-5", "o1", "o3", "o4"))
