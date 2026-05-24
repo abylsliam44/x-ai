@@ -6,6 +6,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { ProjectWizardPage } from './pages/ProjectWizardPage'
 import { ProjectWorkspacePage } from './pages/ProjectWorkspacePage'
 import { SettingsPage } from './pages/SettingsPage'
+import { LandingPage } from './pages/LandingPage'
 import { useAuth } from './hooks/useAuth'
 import { Spinner } from './components/common/Spinner'
 
@@ -47,6 +48,22 @@ function PublicRoute({ children }: { children: ReactNode }) {
   if (user) return <Navigate to="/dashboard" replace />
 
   return <>{children}</>
+}
+
+function LandingRoute() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg">
+        <Spinner size={24} />
+      </div>
+    )
+  }
+
+  if (user) return <Navigate to="/dashboard" replace />
+
+  return <LandingPage />
 }
 
 export function App() {
@@ -116,8 +133,8 @@ export function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<LandingRoute />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

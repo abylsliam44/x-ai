@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>nfactorial — X Content · agentic content infrastructure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #000;
+    --surface:   #0a0a0a;
+    --surface-2: #111;
+    --border:    #1a1a1a;
+    --border-2:  #2a2a2a;
+    --text:      #fff;
+    --text-2:    #a8a8a8;
+    --text-3:    #6e6e6e;
+    --text-4:    #404040;
+    --mono:      'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    --sans:      'Inter', -apple-system, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  body { overflow-x: hidden; }
+  .num { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  .mono { font-family: var(--mono); }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+
+  /* ── Buttons ────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 44px; padding: 0 22px;
+    border-radius: 999px;
+    background: transparent; border: 1px solid var(--border-2);
+    color: var(--text); font: 500 14px var(--sans); cursor: pointer;
+    transition: all .18s ease;
+  }
+  .btn:hover { background: var(--surface-2); border-color: #404040; }
+  .btn-primary {
+    background: #fff; color: #000; border-color: #fff; font-weight: 600;
+  }
+  .btn-primary:hover { background: #e7e7e7; border-color: #e7e7e7; transform: translateY(-1px); }
+  .btn-lg { height: 52px; padding: 0 28px; font-size: 15px; }
+  .btn-arrow { transition: transform .2s; }
+  .btn:hover .btn-arrow { transform: translateX(3px); }
+
+  /* ── Nav ────────────────────────────────────── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 32px;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; font: 600 15px var(--sans); letter-spacing: -.01em; }
+  .nav-brand .mark { width: 26px; height: 26px; background: #fff; color: #000; border-radius: 6px; display: flex; align-items: center; justify-content: center; font: 700 14px var(--sans); }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { color: var(--text-2); font-size: 14px; transition: color .15s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { display: flex; gap: 10px; }
+  .nav-cta .btn { height: 36px; padding: 0 16px; font-size: 13px; }
+
+  /* ── Hero ───────────────────────────────────── */
+  .hero { padding: 140px 32px 80px; position: relative; max-width: 1400px; margin: 0 auto; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 80px; align-items: center; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    height: 32px; padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-2);
+    color: var(--text-2); font: 500 12px var(--sans);
+    background: rgba(255,255,255,.02);
+    margin-bottom: 28px;
+    white-space: nowrap;
+  }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .35; }
+  }
+
+  .hero h1 {
+    font: 700 84px/1 var(--sans);
+    letter-spacing: -.035em;
+    margin: 0;
+  }
+  .hero h1 .stroke {
+    -webkit-text-stroke: 1px #fff;
+    color: transparent;
+    font-style: italic;
+    font-weight: 500;
+  }
+  .hero h1 .glow { position: relative; }
+  .hero h1 .glow::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 4px;
+    background: #fff; border-radius: 2px;
+  }
+  .hero p {
+    font: 400 18px/1.55 var(--sans);
+    color: var(--text-2); max-width: 540px;
+    margin: 28px 0 36px;
+  }
+  .hero-cta { display: flex; gap: 12px; }
+  .hero-meta {
+    display: flex; gap: 32px; margin-top: 56px;
+    padding-top: 32px; border-top: 1px solid var(--border);
+  }
+  .hero-meta .m { }
+  .hero-meta .m .v { font: 700 28px var(--sans); letter-spacing: -.02em; line-height: 1; }
+  .hero-meta .m .k { font: 500 11px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); margin-top: 8px; }
+
+  /* Hero device — live thread mockup */
+  .hero-thread-wrap {
+    position: relative;
+    padding: 36px;
+  }
+  .hero-thread-wrap::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 70% 30%, rgba(255,255,255,.08), transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(255,255,255,.04), transparent 60%);
+    z-index: -1;
+  }
+  .hero-thread {
+    border: 1px solid var(--border-2);
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,.025) 0%, rgba(255,255,255,0) 100%);
+    box-shadow:
+      0 40px 80px -20px rgba(255,255,255,.06),
+      0 0 0 1px rgba(255,255,255,.05) inset;
+    overflow: hidden;
+    transform: perspective(1600px) rotateY(-3deg) rotateX(2deg);
+    transition: transform .4s ease;
+  }
+  .hero-thread:hover { transform: perspective(1600px) rotateY(-1deg) rotateX(0deg); }
+
+  .ht-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,.4);
+    font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .ht-bar .lights { display: flex; gap: 6px; margin-right: 12px; }
+  .ht-bar .lights span { width: 10px; height: 10px; border-radius: 50%; background: var(--border-2); }
+  .ht-bar .spacer { flex: 1; }
+  .ht-bar .live { color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .ht-bar .live .led { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse 1.6s ease-in-out infinite; }
+
+  .ht-post {
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 44px 1fr; gap: 14px;
+    position: relative;
+  }
+  .ht-post .av {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #fff, #888);
+    color: #000; display: flex; align-items: center; justify-content: center;
+    font: 700 16px var(--sans);
+    position: relative;
+  }
+  .ht-post .av .tl { position: absolute; left: 50%; top: 56px; bottom: -22px; width: 2px; background: var(--border-2); transform: translateX(-50%); }
+  .ht-post:last-of-type .av .tl { display: none; }
+  .ht-post .head { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+  .ht-post .name { font-weight: 700; }
+  .ht-post .handle { color: var(--text-3); }
+  .ht-post .dot { color: var(--text-3); }
+  .ht-post .time { color: var(--text-3); }
+  .ht-post .body { font: 400 15px/1.5 var(--sans); margin-top: 4px; white-space: pre-wrap; color: var(--text); }
+  .ht-post .actions {
+    display: flex; gap: 36px; margin-top: 12px; color: var(--text-3);
+  }
+  .ht-post .actions span {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 13px;
+    transition: color .15s; white-space: nowrap; flex-shrink: 0;
+  }
+  .ht-post:hover .actions span:hover { color: var(--text); cursor: pointer; }
+
+  .ht-typing-bar {
+    padding: 16px 22px;
+    display: flex; align-items: center; gap: 12px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,.3);
+    font: 500 12px var(--mono); letter-spacing: .05em; color: var(--text-3);
+  }
+  .ht-typing-bar .spinner {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1.5px solid var(--border-2); border-top-color: #fff;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Floating annotations */
+  .ann {
+    position: absolute;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,.85);
+    border: 1px solid var(--border-2);
+    border-radius: 10px;
+    font: 500 11px var(--mono); color: var(--text-2);
+    letter-spacing: .04em;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,.8);
+    animation: float 4s ease-in-out infinite;
+    z-index: 2; white-space: nowrap;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .ann .check { color: #fff; font-weight: 700; }
+  .ann.a1 { top: -18px; left: 12px; animation-delay: 0s; }
+  .ann.a2 { top: 40%; right: -32px; animation-delay: 1.5s; }
+  .ann.a3 { bottom: -16px; right: 60px; animation-delay: 3s; }
+
+  /* ── Marquee logos ──────────────────────────── */
+  .marq-wrap {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 0;
+    overflow: hidden;
+    margin-top: 40px;
+    position: relative;
+  }
+  .marq-wrap::before, .marq-wrap::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2; pointer-events: none;
+  }
+  .marq-wrap::before { left: 0; background: linear-gradient(90deg, #000, transparent); }
+  .marq-wrap::after { right: 0; background: linear-gradient(-90deg, #000, transparent); }
+  .marq {
+    display: flex; gap: 80px; align-items: center;
+    animation: marquee 32s linear infinite;
+    width: max-content;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marq .label { font: 500 11px var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--text-3); }
+  .marq .name { font: 600 22px var(--sans); color: var(--text-2); letter-spacing: -.01em; opacity: .7; }
+
+  /* ── Section container ─────────────────────── */
+  .section { max-width: 1280px; margin: 0 auto; padding: 120px 32px; }
+  .section-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font: 500 11px var(--mono); letter-spacing: .22em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 22px;
+  }
+  .section-eyebrow::before {
+    content: ""; width: 24px; height: 1px; background: var(--text-3);
+  }
+  .section h2 {
+    font: 600 56px/1.05 var(--sans); letter-spacing: -.025em; margin: 0;
+    max-width: 900px;
+  }
+  .section h2 .stroke { -webkit-text-stroke: 1px #fff; color: transparent; font-style: italic; font-weight: 500; }
+  .section .sub {
+    font: 400 18px/1.55 var(--sans); color: var(--text-2);
+    margin-top: 22px; max-width: 640px;
+  }
+
+  /* ── Pipeline section ──────────────────────── */
+  .pipeline-vis {
+    margin-top: 64px;
+    position: relative;
+  }
+  .pipeline-track {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    gap: 0; position: relative;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .pipeline-track::before {
+    content: ""; position: absolute; left: 0; top: 50%; right: 0; height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .pipeline-track::after {
+    content: ""; position: absolute; left: 0; top: 50%; height: 1px;
+    width: 0; background: #fff;
+    z-index: 1;
+    animation: fill 6s linear infinite;
+  }
+  @keyframes fill {
+    0%   { width: 0; }
+    90%  { width: 100%; }
+    100% { width: 100%; opacity: 0; }
+  }
+
+  .pl-node {
+    padding: 80px 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    border-right: 1px solid var(--border);
+    position: relative;
+    text-align: center;
+  }
+  .pl-node:last-child { border-right: 0; }
+  .pl-node .circle {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 1px solid var(--border-2);
+    display: flex; align-items: center; justify-content: center;
+    background: #000; color: var(--text-2);
+    position: relative; z-index: 2;
+    transition: all .3s;
+  }
+  .pl-node .circle::after {
+    content: ""; position: absolute; inset: -6px; border-radius: 50%;
+    border: 1px solid transparent;
+    transition: border-color .3s;
+  }
+  .pl-node:hover .circle { background: #fff; color: #000; border-color: #fff; }
+  .pl-node:hover .circle::after { border-color: var(--border-2); }
+  .pl-node .num { font: 500 10px var(--mono); letter-spacing: .2em; color: var(--text-3); }
+  .pl-node .name { font: 600 16px var(--sans); }
+  .pl-node .desc { font: 400 12.5px/1.45 var(--sans); color: var(--text-3); max-width: 180px; }
+
+  /* Animated dot traveling along */
+  .pl-spark {
+    position: absolute; left: 0; top: 50%;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 16px rgba(255,255,255,.9);
+    transform: translate(-4px, -4px);
+    z-index: 3;
+    animation: travel 6s linear infinite;
+  }
+  @keyframes travel {
+    0%   { left: 0%; opacity: 0; }
+    5%   { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  /* ── Features bento ─────────────────────────── */
+  .bento {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+    margin-top: 64px;
+  }
+  .b-card {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    padding: 32px;
+    position: relative; overflow: hidden;
+    transition: border-color .25s, transform .25s;
+  }
+  .b-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
+  .b-card h3 { font: 600 22px var(--sans); letter-spacing: -.01em; margin: 0; }
+  .b-card .lead { font: 400 14.5px/1.55 var(--sans); color: var(--text-2); margin: 12px 0 0; }
+  .b-card .tag { font: 500 11px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
+
+  .b-1 { grid-column: 1 / 2; grid-row: 1 / 3; min-height: 480px; display: flex; flex-direction: column; }
+  .b-2 { grid-column: 2 / 3; grid-row: 1 / 2; }
+  .b-3 { grid-column: 3 / 4; grid-row: 1 / 2; }
+  .b-4 { grid-column: 2 / 4; grid-row: 2 / 3; min-height: 240px; }
+
+  /* Source list inside bento 1 */
+  .b-sources { margin-top: auto; padding-top: 28px; display: flex; flex-direction: column; gap: 10px; }
+  .b-src {
+    display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center;
+    padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px;
+    background: rgba(255,255,255,.015);
+    opacity: 0; animation: slideIn .6s cubic-bezier(.2,.9,.3,1) forwards;
+  }
+  .b-src:nth-child(1) { animation-delay: .1s; }
+  .b-src:nth-child(2) { animation-delay: .3s; }
+  .b-src:nth-child(3) { animation-delay: .5s; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .b-src .tag-pill { width: 36px; height: 36px; border-radius: 8px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font: 600 10px var(--mono); border: 1px solid var(--border); color: var(--text-2); }
+  .b-src .title { font: 500 13.5px var(--sans); }
+  .b-src .meta { font: 400 11.5px var(--mono); color: var(--text-3); margin-top: 2px; }
+  .b-src .cred { font: 600 13px var(--mono); }
+  .b-src .cred span { display: block; font: 500 9px var(--mono); letter-spacing: .18em; color: var(--text-3); margin-top: 2px; }
+
+  /* Voice waveform */
+  .voice-wave {
+    margin-top: 24px;
+    display: flex; align-items: center; gap: 4px;
+    height: 64px;
+  }
+  .voice-wave i {
+    flex: 1; background: var(--text-2);
+    border-radius: 2px;
+    animation: voice 1.4s ease-in-out infinite;
+  }
+  .voice-wave i:nth-child(1) { animation-delay: 0s; }
+  .voice-wave i:nth-child(2) { animation-delay: .1s; }
+  .voice-wave i:nth-child(3) { animation-delay: .2s; }
+  .voice-wave i:nth-child(4) { animation-delay: .3s; }
+  .voice-wave i:nth-child(5) { animation-delay: .4s; }
+  .voice-wave i:nth-child(6) { animation-delay: .5s; }
+  .voice-wave i:nth-child(7) { animation-delay: .4s; }
+  .voice-wave i:nth-child(8) { animation-delay: .3s; }
+  .voice-wave i:nth-child(9) { animation-delay: .2s; }
+  .voice-wave i:nth-child(10) { animation-delay: .1s; }
+  .voice-wave i:nth-child(11) { animation-delay: 0s; }
+  .voice-wave i:nth-child(12) { animation-delay: .1s; }
+  .voice-wave i:nth-child(13) { animation-delay: .2s; }
+  .voice-wave i:nth-child(14) { animation-delay: .3s; }
+  .voice-wave i:nth-child(15) { animation-delay: .4s; }
+  @keyframes voice {
+    0%, 100% { height: 20%; }
+    50%      { height: 100%; }
+  }
+
+  /* Fact-check pill demo */
+  .fc-demo { margin-top: 24px; }
+  .fc-demo .row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .fc-demo .row:last-child { border-bottom: 0; }
+  .fc-demo .claim { color: var(--text); }
+  .fc-demo .v {
+    font: 600 10px var(--mono); letter-spacing: .12em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .fc-demo .v-sup { background: #fff; color: #000; }
+  .fc-demo .v-weak { border: 1px solid var(--border-2); color: var(--text-2); }
+  .fc-demo .v-need { border: 1px solid #fff; color: #fff; }
+
+  /* Schedule heatmap */
+  .heatmap {
+    margin-top: 24px;
+    display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px;
+  }
+  .heatmap i {
+    aspect-ratio: 1; border-radius: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+  .heatmap i.l1 { background: #2a2a2a; }
+  .heatmap i.l2 { background: #4a4a4a; }
+  .heatmap i.l3 { background: #888; }
+  .heatmap i.l4 { background: #fff; }
+
+  /* ── Comparison section ─────────────────────── */
+  .compare {
+    margin-top: 64px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .cmp-col {
+    padding: 40px 36px;
+  }
+  .cmp-col:first-child { border-right: 1px solid var(--border); background: transparent; }
+  .cmp-col:last-child { background: var(--surface); }
+  .cmp-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 500 11px var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--text-3);
+    margin-bottom: 18px;
+  }
+  .cmp-col.after .cmp-label { color: var(--text); }
+  .cmp-col.after .cmp-label::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+  .cmp-col h3 { font: 600 24px var(--sans); margin: 0 0 24px; letter-spacing: -.01em; }
+  .cmp-list { list-style: none; padding: 0; margin: 0; }
+  .cmp-list li {
+    display: grid; grid-template-columns: 20px 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px; color: var(--text);
+  }
+  .cmp-list li:last-child { border-bottom: 0; }
+  .cmp-list li.x .ic { color: var(--text-4); }
+  .cmp-list li.v .ic { color: #fff; }
+  .cmp-time {
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .cmp-time .v { font: 700 48px var(--sans); letter-spacing: -.02em; line-height: 1; }
+  .cmp-time .u { font: 500 13px var(--mono); color: var(--text-3); letter-spacing: .14em; text-transform: uppercase; }
+
+  /* ── Why grid (replaces stats strip) ──────── */
+  .why-grid {
+    margin-top: 56px;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .why-cell {
+    padding: 40px 28px;
+    border-right: 1px solid var(--border);
+  }
+  .why-cell:last-child { border-right: 0; }
+  .why-cell .why-h { font: 600 22px var(--sans); letter-spacing: -.01em; }
+  .why-cell .why-d { font: 400 14px/1.55 var(--sans); color: var(--text-2); margin-top: 14px; }
+
+  /* ── Stats strip (kept for fallback) ──────── */
+  .stats-strip {
+    margin: 60px 0 0;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-cell {
+    padding: 48px 28px;
+    border-right: 1px solid var(--border);
+  }
+  .stat-cell:last-child { border-right: 0; }
+  .stat-cell .v {
+    font: 700 64px var(--sans); letter-spacing: -.04em; line-height: .95;
+    background: linear-gradient(180deg, #fff 30%, #888 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  .stat-cell .k { font: 500 11px var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--text-3); margin-top: 14px; }
+  .stat-cell .desc { font: 400 13px/1.5 var(--sans); color: var(--text-2); margin-top: 12px; max-width: 220px; }
+
+  /* ── How it feels (testimonial-shaped quote) ── */
+  .quote-section { text-align: center; }
+  .big-quote {
+    font: 500 56px/1.15 var(--sans); letter-spacing: -.02em;
+    max-width: 1080px; margin: 0 auto;
+  }
+  .big-quote .stroke { -webkit-text-stroke: 1px #fff; color: transparent; font-style: italic; font-weight: 500; }
+  .quote-attr {
+    margin-top: 40px;
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 12px 20px 12px 14px;
+    border: 1px solid var(--border-2); border-radius: 999px;
+  }
+  .quote-attr .av { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #fff, #888); color: #000; display: flex; align-items: center; justify-content: center; font: 700 14px var(--sans); }
+  .quote-attr .who { font-size: 14px; font-weight: 500; text-align: left; }
+  .quote-attr .who .role { font: 400 12px var(--mono); color: var(--text-3); }
+
+  /* ── Pricing ─────────────────────────────── */
+  .pricing {
+    margin-top: 64px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .price-card {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px; background: var(--surface);
+    display: flex; flex-direction: column;
+    transition: all .25s ease;
+  }
+  .price-card:hover { border-color: var(--border-2); transform: translateY(-3px); }
+  .price-card.featured {
+    background: #fff; color: #000;
+    border-color: #fff;
+    box-shadow: 0 24px 60px -20px rgba(255,255,255,.15);
+  }
+  .price-card .tier {
+    font: 500 12px var(--mono); letter-spacing: .18em; text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .price-card.featured .tier { color: #555; }
+  .price-card .price { font: 700 56px var(--sans); letter-spacing: -.03em; margin: 18px 0 4px; }
+  .price-card .per { font: 400 13px var(--mono); color: var(--text-3); }
+  .price-card.featured .per { color: #555; }
+  .price-card .pitch { font: 400 14px/1.5 var(--sans); color: var(--text-2); margin: 20px 0 0; }
+  .price-card.featured .pitch { color: #333; }
+  .price-card .pl { list-style: none; padding: 0; margin: 24px 0; flex: 1; }
+  .price-card .pl li {
+    display: grid; grid-template-columns: 18px 1fr;
+    gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .price-card.featured .pl li { border-bottom-color: #e7e7e7; }
+  .price-card .pl li:last-child { border-bottom: 0; }
+  .price-card .pl .ic { color: var(--text); }
+  .price-card.featured .pl .ic { color: #000; }
+  .price-card .pbtn {
+    height: 48px; border-radius: 999px;
+    background: transparent; border: 1px solid var(--border-2); color: var(--text);
+    font: 500 14px var(--sans); cursor: pointer;
+    transition: all .15s;
+  }
+  .price-card .pbtn:hover { background: var(--surface-2); }
+  .price-card.featured .pbtn { background: #000; color: #fff; border-color: #000; }
+  .price-card.featured .pbtn:hover { background: #1a1a1a; }
+  .price-card .badge-hot {
+    display: inline-block; font: 500 10px var(--mono); letter-spacing: .18em; text-transform: uppercase;
+    padding: 3px 10px; background: #000; color: #fff;
+    border-radius: 999px; margin-left: 10px;
+  }
+
+  /* ── Final CTA ──────────────────────────────── */
+  .cta-shell {
+    margin: 80px 0 0;
+    border: 1px solid var(--border-2);
+    border-radius: 32px;
+    padding: 96px 60px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 0%, rgba(255,255,255,.07), transparent 60%),
+      var(--surface);
+    position: relative; overflow: hidden;
+  }
+  .cta-shell::before {
+    content: ""; position: absolute; left: 50%; top: -80px; width: 200px; height: 200px;
+    background: rgba(255,255,255,.04);
+    border-radius: 50%; filter: blur(60px);
+    transform: translateX(-50%);
+  }
+  .cta-shell h2 {
+    font: 700 80px/.95 var(--sans); letter-spacing: -.035em; margin: 0;
+    max-width: 900px; margin-left: auto; margin-right: auto;
+  }
+  .cta-shell h2 .stroke { -webkit-text-stroke: 1px #fff; color: transparent; font-style: italic; font-weight: 500; }
+  .cta-shell p { font: 400 17px/1.55 var(--sans); color: var(--text-2); margin: 28px auto 0; max-width: 520px; }
+  .cta-shell .cta-btns { display: flex; gap: 12px; justify-content: center; margin-top: 40px; }
+
+  /* ── Footer ─────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 56px 32px 32px;
+    max-width: 1280px; margin: 80px auto 0;
+  }
+  .foot-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px; border-bottom: 1px solid var(--border);
+  }
+  .foot-grid .lead { max-width: 320px; font-size: 13px; color: var(--text-2); margin: 18px 0 0; }
+  .foot-col h5 { font: 500 11px var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--text-3); margin: 0 0 16px; }
+  .foot-col ul { list-style: none; padding: 0; margin: 0; }
+  .foot-col li { font-size: 13.5px; color: var(--text-2); padding: 5px 0; cursor: pointer; transition: color .12s; }
+  .foot-col li:hover { color: var(--text); }
+  .foot-base { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; font-size: 12.5px; color: var(--text-3); font-family: var(--mono); letter-spacing: .04em; }
+
+  /* ── Scroll-reveal ─────────────────────────── */
+  .reveal { opacity: 0; transform: translateY(20px); transition: all .8s cubic-bezier(.2,.9,.3,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive ────────────────────────────── */
+  @media (max-width: 1100px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 60px; }
+    .hero h1 { font-size: 64px; }
+    .ann { display: none; }
+    .bento { grid-template-columns: 1fr; }
+    .b-1, .b-2, .b-3, .b-4 { grid-column: 1; grid-row: auto; min-height: 0; }
+    .pricing { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .stat-cell:nth-child(2) { border-right: 0; }
+    .stat-cell:nth-child(1), .stat-cell:nth-child(2) { border-bottom: 1px solid var(--border); }
+    .pipeline-track { grid-template-columns: repeat(2, 1fr); }
+    .pl-node { padding: 36px 16px; }
+    .compare { grid-template-columns: 1fr; }
+    .cmp-col:first-child { border-right: 0; border-bottom: 1px solid var(--border); }
+    .section h2 { font-size: 40px; }
+    .big-quote { font-size: 36px; }
+    .cta-shell h2 { font-size: 48px; }
+    .cta-shell { padding: 60px 28px; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+    .hero-thread { transform: none; }
+  }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .nav { padding: 14px 20px; }
+    .hero { padding: 110px 20px 60px; }
+    .hero h1 { font-size: 44px; }
+    .section { padding: 80px 20px; }
+    .stats-strip { grid-template-columns: 1fr; }
+    .stat-cell { border-right: 0; border-bottom: 1px solid var(--border); }
+    .stat-cell:last-child { border-bottom: 0; }
+    .foot-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav-brand">
+    <span class="mark">n</span>
+    <span>nfactorial<span style="color:var(--text-3);font-weight:400;margin-left:6px">— X Content</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#docs">Docs</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn">Sign in</button>
+    <button class="btn btn-primary">Start free</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-grid">
+    <div>
+      <span class="badge">
+        <span class="dot"></span>
+        Now connecting to X
+      </span>
+      <h1>
+        Publish to X<br>
+        like an <span class="stroke">operator</span>,<br>
+        not a content<span class="glow">&nbsp;mill</span>.
+      </h1>
+      <p>nfactorial — X Content is an agentic platform that researches, drafts, fact-checks and publishes posts on X — with humans at every gate. Built for founders who'd rather ship than tweet.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-lg">Start drafting <span class="btn-arrow">→</span></button>
+        <button class="btn btn-lg">See a live demo</button>
+      </div>
+
+      <div class="hero-meta">
+        <div class="m">
+          <div class="k" style="font-size:13px;text-transform:none;letter-spacing:.02em;color:var(--text-2);font-family:var(--sans);margin-top:0;line-height:1.5;max-width:560px">No content calendar to maintain. No fact-checking spreadsheet. No "voice doc" to enforce by hand. Drop a topic, approve the gates, publish the thread.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-thread-wrap">
+      <div class="ann a1"><span class="check">●</span> Research complete</div>
+      <div class="ann a2"><span class="check">✓</span> Fact check passed</div>
+      <div class="ann a3"><span class="check">●</span> Brand voice OK</div>
+
+      <div class="hero-thread">
+        <div class="ht-bar">
+          <div class="lights"><span></span><span></span><span></span></div>
+          <span>nfactorial · drafting</span>
+          <span class="spacer"></span>
+          <span class="live"><span class="led"></span> live</span>
+        </div>
+
+        <div class="ht-post">
+          <div class="av">N<div class="tl"></div></div>
+          <div>
+            <div class="head">
+              <span class="name">nfactorial</span>
+              <span class="handle">@nfactorial_hq</span>
+              <span class="dot">·</span>
+              <span class="time">now</span>
+            </div>
+            <div class="body">The cost of building a startup has collapsed.
+
+The cost of being noticed has not.
+
+Distribution is the only moat that scales.</div>
+            <div class="actions">
+              <span>↺ reply</span>
+              <span>↻ repost</span>
+              <span>♡ like</span>
+              <span>↗ share</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ht-post">
+          <div class="av">N<div class="tl"></div></div>
+          <div>
+            <div class="head">
+              <span class="name">nfactorial</span>
+              <span class="handle">@nfactorial_hq</span>
+              <span class="dot">·</span>
+              <span class="time">now</span>
+            </div>
+            <div class="body">Software margins are deflating toward zero.
+
+Attention margins are inflating toward infinity.
+
+The arbitrage is in the middle — and most teams are still optimizing the product, not the channel.</div>
+            <div class="actions">
+              <span>↺ reply</span>
+              <span>↻ repost</span>
+              <span>♡ like</span>
+              <span>↗ share</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ht-post">
+          <div class="av">N</div>
+          <div>
+            <div class="head">
+              <span class="name">nfactorial</span>
+              <span class="handle">@nfactorial_hq</span>
+              <span class="dot">·</span>
+              <span class="time">now</span>
+            </div>
+            <div class="body">We've been wrong about content velocity.
+
+More posts ≠ more growth. Calibration beats cadence, every time.</div>
+            <div class="actions">
+              <span>↺ reply</span>
+              <span>↻ repost</span>
+              <span>♡ like</span>
+              <span>↗ share</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ht-typing-bar">
+          <span class="spinner"></span>
+          writer-agent · streaming next post…
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- end hero -->
+</header>
+
+<!-- HOW IT WORKS — Pipeline -->
+<section class="section reveal" id="how">
+  <div class="section-eyebrow">How it works</div>
+  <h2>Six agents. <span class="stroke">One thread.</span><br>No marketing speak.</h2>
+  <p class="sub">Every post moves through the same DAG: research, insight, angle, draft, review, publish. You see every step and approve every gate.</p>
+
+  <div class="pipeline-vis">
+    <div class="pipeline-track">
+      <div class="pl-spark"></div>
+
+      <div class="pl-node">
+        <div class="num">01</div>
+        <div class="circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </div>
+        <div class="name">Research</div>
+        <div class="desc">Scans the web, your uploads, internal docs.</div>
+      </div>
+      <div class="pl-node">
+        <div class="num">02</div>
+        <div class="circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.6 4.5L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.5z"/></svg>
+        </div>
+        <div class="name">Insight</div>
+        <div class="desc">Extracts non-obvious, evidence-backed claims.</div>
+      </div>
+      <div class="pl-node">
+        <div class="num">03</div>
+        <div class="circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="20" r="2"/><path d="M6 8v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8M12 13v5"/></svg>
+        </div>
+        <div class="name">Angle</div>
+        <div class="desc">Generates 4 takes; you pick the sharpest.</div>
+      </div>
+      <div class="pl-node">
+        <div class="num">04</div>
+        <div class="circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21l4-1 12-12-3-3L4 17z"/></svg>
+        </div>
+        <div class="name">Draft</div>
+        <div class="desc">Writes in your voice with citations inline.</div>
+      </div>
+      <div class="pl-node">
+        <div class="num">05</div>
+        <div class="circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 12 10 18 20 6"/></svg>
+        </div>
+        <div class="name">Review</div>
+        <div class="desc">Fact-checks every claim. Flags style breaks.</div>
+      </div>
+      <div class="pl-node">
+        <div class="num">06</div>
+        <div class="circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4l6 6-9 9-3 3-3-3 3-3 9-9z"/><path d="M14 10l4 4"/></svg>
+        </div>
+        <div class="name">Publish</div>
+        <div class="desc">Schedules or pushes the reply chain to X.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES — BENTO -->
+<section class="section reveal" id="features">
+  <div class="section-eyebrow">What's in the box</div>
+  <h2>Built for the part of writing<br>that <span class="stroke">isn't</span> writing.</h2>
+  <p class="sub">Research, voice modelling, fact-checking, scheduling, and an X reply-chain publisher — all in one workspace.</p>
+
+  <div class="bento">
+    <div class="b-card b-1">
+      <div class="tag">Research engine</div>
+      <h3>Scan the web like a junior analyst with a deadline.</h3>
+      <p class="lead">Pulls from your knowledge graph, the open web, your uploaded PDFs, and recent X discourse. Sources are scored and dropped below a credibility threshold.</p>
+
+      <div class="b-sources">
+        <div class="b-src">
+          <div class="tag-pill">PAP</div>
+          <div>
+            <div class="title">Research paper</div>
+            <div class="meta">arxiv · peer-reviewed</div>
+          </div>
+          <div class="cred" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);font-weight:500">High</div>
+        </div>
+        <div class="b-src">
+          <div class="tag-pill">PDF</div>
+          <div>
+            <div class="title">Your uploaded document</div>
+            <div class="meta">internal · first-party data</div>
+          </div>
+          <div class="cred" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);font-weight:500">First-party</div>
+        </div>
+        <div class="b-src">
+          <div class="tag-pill">X</div>
+          <div>
+            <div class="title">Operator post on X</div>
+            <div class="meta">x.com · verified author</div>
+          </div>
+          <div class="cred" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);font-weight:500">Medium</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="b-card b-2">
+      <div class="tag">Voice modeling</div>
+      <h3>Sounds like you. Not like ChatGPT.</h3>
+      <p class="lead">Upload 20 samples. We learn rhythm, cadence, forbidden phrases, and the specific way you start a sentence.</p>
+      <div class="voice-wave">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+
+    <div class="b-card b-3">
+      <div class="tag">Fact check</div>
+      <h3>Every number has a source. Or it gets flagged.</h3>
+      <div class="fc-demo">
+        <div class="row"><span class="claim">A cited statistic</span><span class="v v-sup">Supported</span></div>
+        <div class="row"><span class="claim">A general assertion</span><span class="v v-weak">Weak</span></div>
+        <div class="row"><span class="claim">An unsourced claim</span><span class="v v-need">Needs src</span></div>
+      </div>
+    </div>
+
+    <div class="b-card b-4">
+      <div class="tag">Schedule</div>
+      <h3>Cadence without the grind.</h3>
+      <p class="lead">Sees when your audience is awake. Spaces threads so you don't burn the feed.</p>
+      <div class="heatmap">
+        <i></i><i class="l1"></i><i></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><i class="l3"></i><i class="l2"></i><i class="l1"></i><i></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l2"></i>
+        <i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><i class="l4"></i><i class="l3"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><i class="l3"></i><i class="l2"></i><i class="l1"></i><i></i><i></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY SWITCH (replaces stats strip) -->
+<section class="section reveal">
+  <div class="section-eyebrow">Why teams switch</div>
+  <h2>The work that matters,<br>without the work that <span class="stroke">doesn't</span>.</h2>
+  <p class="sub">Research, drafting, fact-checking and scheduling all happen in one loop — so you can spend your time on the ideas, not the choreography.</p>
+
+  <div class="why-grid">
+    <div class="why-cell">
+      <div class="why-h">Cadence without grind</div>
+      <div class="why-d">Publish on a real rhythm without writing every post by hand. The agents draft, you approve.</div>
+    </div>
+    <div class="why-cell">
+      <div class="why-h">Citations or nothing</div>
+      <div class="why-d">Every claim is either tied to a source or flagged at the gate. Hallucinations don't make it to the timeline.</div>
+    </div>
+    <div class="why-cell">
+      <div class="why-h">Your voice, not theirs</div>
+      <div class="why-d">Trained on your writing samples — cadence, taboo phrases, sentence starters. It sounds like you, not like a model.</div>
+    </div>
+    <div class="why-cell">
+      <div class="why-h">Humans at every gate</div>
+      <div class="why-d">Approve sources, angles, the draft, and the publish. Nothing ships without you saying so.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="section reveal">
+  <div class="section-eyebrow">Before / After</div>
+  <h2>Writing one thread<br>used to take <span class="stroke">a Tuesday</span>.</h2>
+
+  <div class="compare">
+    <div class="cmp-col before">
+      <div class="cmp-label">Before nfactorial</div>
+      <h3>The thread-writing Tuesday</h3>
+      <ul class="cmp-list">
+        <li class="x"><span class="ic">○</span> Open a pile of tabs, lose half of them</li>
+        <li class="x"><span class="ic">○</span> Fact-check by squinting at your PDFs</li>
+        <li class="x"><span class="ic">○</span> Forget the actual point you wanted to make</li>
+        <li class="x"><span class="ic">○</span> Rewrite the opener until it feels okay</li>
+        <li class="x"><span class="ic">○</span> Publish late at night, past your audience</li>
+      </ul>
+    </div>
+    <div class="cmp-col after">
+      <div class="cmp-label">With nfactorial</div>
+      <h3>The thread-writing coffee</h3>
+      <ul class="cmp-list">
+        <li class="v"><span class="ic">●</span> Drop a topic, get scored sources back</li>
+        <li class="v"><span class="ic">●</span> Pick from a few angles, see the thesis</li>
+        <li class="v"><span class="ic">●</span> Draft streams in your voice, with citations</li>
+        <li class="v"><span class="ic">●</span> Every claim verified or flagged</li>
+        <li class="v"><span class="ic">●</span> Schedule for when your audience is awake</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- end quote section removed -->
+
+<!-- PRICING -->
+<section class="section reveal" id="pricing">
+  <div class="section-eyebrow">Plans</div>
+  <h2>Pick a plan<br>that matches your <span class="stroke">cadence</span>.</h2>
+  <p class="sub">Three tiers, from a single founder voice to a content team running many accounts. Pricing on request.</p>
+
+  <div class="pricing">
+    <div class="price-card">
+      <div class="tier">Solo</div>
+      <div class="price" style="font-size:36px;letter-spacing:-.02em;font-weight:600">For founders</div>
+      <div class="per">testing the voice</div>
+      <p class="pitch">One brand voice. Manual publishing. Standard research depth. Enough to find out whether the loop works for you.</p>
+      <ul class="pl">
+        <li><span class="ic">✓</span> One brand voice</li>
+        <li><span class="ic">✓</span> Standard research depth</li>
+        <li><span class="ic">✓</span> Manual publishing</li>
+        <li><span class="ic">✓</span> Fact-check + style gates</li>
+      </ul>
+      <button class="pbtn">Start free</button>
+    </div>
+
+    <div class="price-card featured">
+      <div class="tier">Operator <span class="badge-hot">Most popular</span></div>
+      <div class="price" style="font-size:36px;letter-spacing:-.02em;font-weight:600">For founders</div>
+      <div class="per">shipping content as infrastructure</div>
+      <p class="pitch">Multiple voices, deep research, auto-scheduling, full reply-chain publishing, and the agent trace explorer.</p>
+      <ul class="pl">
+        <li><span class="ic">✓</span> Multiple brand voices</li>
+        <li><span class="ic">✓</span> Deep research + uploads</li>
+        <li><span class="ic">✓</span> Auto-schedule + reply chain</li>
+        <li><span class="ic">✓</span> Agent trace explorer</li>
+        <li><span class="ic">✓</span> Priority support</li>
+      </ul>
+      <button class="pbtn">Start trial</button>
+    </div>
+
+    <div class="price-card">
+      <div class="tier">Studio</div>
+      <div class="price" style="font-size:36px;letter-spacing:-.02em;font-weight:600">For teams</div>
+      <div class="per">running parallel accounts</div>
+      <p class="pitch">Multi-account publishing, SSO, audit logs, custom agent steps, and a workspace built for studios and agencies.</p>
+      <ul class="pl">
+        <li><span class="ic">✓</span> Everything in Operator</li>
+        <li><span class="ic">✓</span> Multi-account publishing</li>
+        <li><span class="ic">✓</span> SSO + audit logs</li>
+        <li><span class="ic">✓</span> Custom agent steps</li>
+      </ul>
+      <button class="pbtn">Talk to us</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section reveal">
+  <div class="cta-shell">
+    <h2>Make every post<br>worth <span class="stroke">publishing</span>.</h2>
+    <p>Start free. Connect X in a couple of clicks. Draft your first thread in one sitting.</p>
+    <div class="cta-btns">
+      <button class="btn btn-primary btn-lg">Start drafting <span class="btn-arrow">→</span></button>
+      <button class="btn btn-lg">Read the docs</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="nav-brand" style="margin-bottom: 4px;">
+        <span class="mark">n</span>
+        <span>nfactorial <span style="color:var(--text-3);font-weight:400">— X Content</span></span>
+      </div>
+      <p class="lead">Agentic content infrastructure for X. Research, draft, fact-check, publish — with humans at every gate.</p>
+    </div>
+    <div class="foot-col">
+      <h5>Product</h5>
+      <ul>
+        <li>How it works</li>
+        <li>Features</li>
+        <li>Pricing</li>
+        <li>Changelog</li>
+        <li>Roadmap</li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h5>Resources</h5>
+      <ul>
+        <li>Docs</li>
+        <li>API reference</li>
+        <li>Brand voice guide</li>
+        <li>Blog</li>
+        <li>Support</li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h5>Company</h5>
+      <ul>
+        <li>About</li>
+        <li>Careers</li>
+        <li>Privacy</li>
+        <li>Terms</li>
+        <li>X · @nfactorial_hq</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-base">
+    <span>© nfactorial — X Content</span>
+    <span>status · operational</span>
+  </div>
+</footer>
+
+<script>
+  // Scroll-reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
