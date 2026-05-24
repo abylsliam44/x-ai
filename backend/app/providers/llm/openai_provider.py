@@ -55,8 +55,9 @@ class OpenAIProvider(LLMProvider):
             "model": resolved_model,
             "messages": [{"role": m.role, "content": m.content} for m in messages],
             "temperature": temperature,
-            "max_tokens": capped_tokens,
         }
+        token_param = "max_completion_tokens" if _uses_max_completion_tokens(resolved_model) else "max_tokens"
+        kwargs[token_param] = capped_tokens
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
 
@@ -206,3 +207,8 @@ class OpenAIProvider(LLMProvider):
             ) from exc
         except Exception as exc:
             raise ProviderError(f"OpenAI TTS failed: {exc}") from exc
+
+
+def _uses_max_completion_tokens(model: str) -> bool:
+    normalized = model.lower()
+    return normalized.startswith(("gpt-5", "o1", "o3", "o4"))
