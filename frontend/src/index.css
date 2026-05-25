@@ -233,3 +233,115 @@ html, body, #root {
 .pipeline-fill-anim {
   animation: progressFillV 0.5s ease forwards;
 }
+
+/* ── Visual polish utilities ───────────────────────────────────── */
+
+/* Dot grid background */
+.dot-grid {
+  background-image: radial-gradient(circle, #ffffff08 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Gradient top border on cards */
+.card-accent::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  border-radius: inherit;
+}
+
+/* Glow on interactive cards hover */
+.card-glow {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-glow:hover {
+  border-color: #2a2a2a;
+  box-shadow: 0 0 0 1px #2a2a2a, 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Subtle inner glow on focused inputs */
+input:focus, textarea:focus {
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.05);
+}
+
+/* Brand mark glow */
+@keyframes brandPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+  50%       { box-shadow: 0 0 12px 2px rgba(255,255,255,0.08); }
+}
+.brand-glow {
+  animation: brandPulse 4s ease-in-out infinite;
+}
+
+/* Nav active accent line */
+.nav-active-line {
+  position: relative;
+}
+.nav-active-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 16px;
+  background: #fff;
+  border-radius: 1px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, #a8a8a8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle noise overlay on surface */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Stat card number shimmer on mount */
+@keyframes numReveal {
+  from { opacity: 0; transform: translateY(4px) scale(0.97); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0) scale(1);    filter: blur(0); }
+}
+.num-reveal {
+  animation: numReveal 0.5s cubic-bezier(.2,.9,.3,1) both;
+}
+
+/* Hover lift for action cards */
+.lift-hover {
+  transition: transform 0.18s cubic-bezier(.2,.9,.3,1), box-shadow 0.18s ease;
+}
+.lift-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+}
+
+/* Gradient border button */
+.btn-glow {
+  position: relative;
+}
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.04));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.btn-glow:hover::before {
+  opacity: 1;
+}

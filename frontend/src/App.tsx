@@ -6,20 +6,27 @@ import { DashboardPage } from './pages/DashboardPage'
 import { ProjectWizardPage } from './pages/ProjectWizardPage'
 import { ProjectWorkspacePage } from './pages/ProjectWorkspacePage'
 import { SettingsPage } from './pages/SettingsPage'
+import { OnboardingPage } from './pages/OnboardingPage'
 import { LandingPage } from './pages/LandingPage'
 import { useAuth } from './hooks/useAuth'
+import { isOnboardingDone } from './lib/onboarding'
 import { Spinner } from './components/common/Spinner'
 
-function ProtectedRoute({ children }: { children: ReactNode }) {
+function ProtectedRoute({ children, skipOnboardingCheck = false }: { children: ReactNode; skipOnboardingCheck?: boolean }) {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return
+    if (!user) {
       navigate('/login', { state: { from: location }, replace: true })
+      return
     }
-  }, [user, loading, navigate, location])
+    if (!skipOnboardingCheck && !isOnboardingDone()) {
+      navigate('/onboarding', { replace: true })
+    }
+  }, [user, loading, navigate, location, skipOnboardingCheck])
 
   if (loading) {
     return (
@@ -30,6 +37,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   if (!user) return null
+  if (!skipOnboardingCheck && !isOnboardingDone()) return null
 
   return <>{children}</>
 }
@@ -45,7 +53,7 @@ function PublicRoute({ children }: { children: ReactNode }) {
     )
   }
 
-  if (user) return <Navigate to="/dashboard" replace />
+  if (user) return <Navigate to={isOnboardingDone() ? '/dashboard' : '/onboarding'} replace />
 
   return <>{children}</>
 }
@@ -61,7 +69,7 @@ function LandingRoute() {
     )
   }
 
-  if (user) return <Navigate to="/dashboard" replace />
+  if (user) return <Navigate to={isOnboardingDone() ? '/dashboard' : '/onboarding'} replace />
 
   return <LandingPage />
 }
@@ -83,6 +91,14 @@ export function App() {
           <PublicRoute>
             <RegisterPage />
           </PublicRoute>
+        }
+      />
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute skipOnboardingCheck>
+            <OnboardingPage />
+          </ProtectedRoute>
         }
       />
       <Route

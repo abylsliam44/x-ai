@@ -13,29 +13,33 @@ export function Topbar({ breadcrumbs, chip, actions }: TopbarProps) {
     <div className="sticky top-0 z-20 flex flex-col">
       <MockBanner />
       <div
-        className="grid items-center h-16 border-b border-border"
+        className="grid items-center h-14 border-b border-border"
         style={{
           gridTemplateColumns: '240px 1fr auto',
-          background: 'rgba(0,0,0,.85)',
-          backdropFilter: 'blur(20px)',
+          background: 'rgba(0,0,0,0.88)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
         }}
       >
         {/* Brand */}
         <Link
           to="/dashboard"
-          className="flex items-center gap-[10px] px-[22px] h-full border-r border-border hover:opacity-80 transition-opacity"
+          className="flex items-center gap-[10px] px-5 h-full border-r border-border hover:bg-surface/40 transition-colors"
         >
-          <div className="w-[26px] h-[26px] bg-tx text-bg rounded-md flex items-center justify-center font-bold text-sm">
+          <div className="brand-glow w-[24px] h-[24px] bg-tx text-bg rounded-[6px] flex items-center justify-center font-bold text-[13px] shrink-0">
             n
           </div>
-          <span className="font-semibold text-[15px] tracking-[-0.01em]">nfactorial</span>
+          <div className="flex flex-col leading-none">
+            <span className="font-semibold text-[13px] tracking-[-0.02em] text-tx">nfactorial</span>
+            <span className="font-mono text-[9px] text-tx4 tracking-[0.1em] uppercase mt-0.5">X Content</span>
+          </div>
         </Link>
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-[14px] px-[22px] text-tx2 text-[13px]">
+        <div className="flex items-center gap-2 px-5 text-tx3 text-[13px]">
           {breadcrumbs?.map((crumb, i) => (
-            <span key={i} className="flex items-center gap-[14px]">
-              {i > 0 && <span className="text-tx4">/</span>}
+            <span key={i} className="flex items-center gap-2">
+              {i > 0 && <span className="text-tx4 text-[11px]">/</span>}
               {crumb.to ? (
                 <Link to={crumb.to} className="hover:text-tx transition-colors">
                   {crumb.label}
@@ -46,8 +50,8 @@ export function Topbar({ breadcrumbs, chip, actions }: TopbarProps) {
             </span>
           ))}
           {chip && (
-            <span className="inline-flex items-center gap-2 h-[30px] px-3 border border-border rounded-pill text-xs text-tx2">
-              <span className="w-1.5 h-1.5 rounded-full bg-tx" />
+            <span className="inline-flex items-center gap-1.5 h-[26px] px-3 border border-border rounded-pill text-[11px] font-mono text-tx3 ml-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-tx animate-pulse" />
               {chip}
             </span>
           )}
@@ -55,7 +59,7 @@ export function Topbar({ breadcrumbs, chip, actions }: TopbarProps) {
 
         {/* Actions */}
         {actions && (
-          <div className="flex items-center gap-2 pr-[22px]">{actions}</div>
+          <div className="flex items-center gap-2 pr-5">{actions}</div>
         )}
       </div>
     </div>

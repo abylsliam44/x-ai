@@ -7,24 +7,30 @@ interface NavItemProps {
   icon: string
   label: string
   count?: number
+  end?: boolean
 }
 
-function NavItem({ to, icon, label, count }: NavItemProps) {
+function NavItem({ to, icon, label, count, end }: NavItemProps) {
   return (
     <NavLink
       to={to}
+      end={end}
       className={({ isActive }) =>
-        `flex items-center gap-3 px-3 py-[9px] rounded-pill text-sm cursor-pointer transition-all duration-150 ${
+        `nav-active-line relative flex items-center gap-3 px-3 pl-4 py-[9px] rounded-lg text-sm cursor-pointer transition-all duration-150 ${
           isActive
-            ? 'text-tx bg-surface2 font-medium'
-            : 'text-tx2 hover:bg-surface2 hover:text-tx'
+            ? 'text-tx bg-surface2 font-medium border border-border2/60'
+            : 'text-tx3 hover:bg-surface2/60 hover:text-tx border border-transparent'
         }`
       }
     >
-      <Icon name={icon} size={18} />
-      <span>{label}</span>
-      {count !== undefined && (
-        <span className="ml-auto font-mono text-[11px] text-tx4">{count}</span>
+      {({ isActive }) => (
+        <>
+          <Icon name={icon} size={16} className={isActive ? 'text-tx' : 'text-tx4'} />
+          <span className="tracking-[-0.005em]">{label}</span>
+          {count !== undefined && (
+            <span className="ml-auto font-mono text-[11px] text-tx4 bg-surface px-1.5 py-0.5 rounded">{count}</span>
+          )}
+        </>
       )}
     </NavLink>
   )
@@ -39,51 +45,60 @@ export function Sidebar() {
     : user?.email?.[0]?.toUpperCase() ?? 'U'
 
   return (
-    <aside className="border-r border-border px-[14px] py-5 flex flex-col gap-0 sticky top-0 h-screen overflow-y-auto">
-      {/* Main nav */}
-      <div className="flex flex-col gap-1">
-        <NavItem to="/dashboard" icon="home" label="Dashboard" />
-        <NavItem to="/projects" icon="folder" label="Projects" />
-        <NavItem to="/settings/brand-voice" icon="spark" label="Brand Voice" />
-        <NavItem to="/settings/writing-samples" icon="lib" label="Samples" />
+    <aside className="border-r border-border px-3 py-5 flex flex-col sticky top-0 h-screen overflow-y-auto bg-surface/30">
+
+      {/* Section label */}
+      <div className="px-1 pb-2 font-mono text-[9px] tracking-[0.22em] uppercase text-tx4">
+        Workspace
       </div>
 
-      {/* Account */}
-      <div className="mt-5 pt-5 border-t border-border flex flex-col gap-1">
-        <div className="px-3 pb-2 font-mono text-[10px] tracking-[0.2em] uppercase text-tx4">
-          Account
+      {/* Main nav */}
+      <div className="flex flex-col gap-0.5">
+        <NavItem to="/dashboard" icon="home" label="Dashboard" end />
+        <NavItem to="/projects" icon="folder" label="Projects" />
+      </div>
+
+      {/* Content section */}
+      <div className="mt-5">
+        <div className="px-1 pb-2 font-mono text-[9px] tracking-[0.22em] uppercase text-tx4">
+          Content
         </div>
+        <div className="flex flex-col gap-0.5">
+          <NavItem to="/settings/brand-voice" icon="spark" label="Brand Voice" />
+          <NavItem to="/settings/writing-samples" icon="lib" label="Samples" />
+        </div>
+      </div>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* User card */}
+      <div className="mt-4 pt-4 border-t border-border">
         <button
-          className="flex items-center gap-3 px-3 py-[9px] rounded-pill text-sm text-tx2 hover:bg-surface2 hover:text-tx transition-all duration-150 text-left w-full"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm hover:bg-surface2 transition-all duration-150 text-left group"
           onClick={() => navigate('/settings')}
         >
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-            style={{ background: 'linear-gradient(135deg, #fff, #888)', color: '#000' }}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ring-1 ring-border2 group-hover:ring-border2"
+            style={{ background: 'linear-gradient(135deg, #e0e0e0, #666)', color: '#000' }}
           >
             {initials}
           </div>
-          <div className="flex flex-col leading-tight min-w-0">
-            <span className="text-[13px] text-tx truncate">{user?.full_name ?? user?.email}</span>
+          <div className="flex flex-col leading-tight min-w-0 flex-1">
+            <span className="text-[13px] text-tx truncate font-medium">{user?.full_name ?? user?.email}</span>
             {user?.full_name && (
-              <span className="text-[12px] text-tx3 font-mono truncate">{user.email}</span>
+              <span className="text-[11px] text-tx4 font-mono truncate">{user.email}</span>
             )}
           </div>
+          <Icon name="settings" size={13} className="text-tx4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
         </button>
-      </div>
 
-      {/* System */}
-      <div className="mt-5 pt-5 border-t border-border flex flex-col gap-1">
-        <div className="px-3 pb-2 font-mono text-[10px] tracking-[0.2em] uppercase text-tx4">
-          System
-        </div>
-        <NavItem to="/settings" icon="settings" label="Settings" />
         <button
-          className="flex items-center gap-3 px-3 py-[9px] rounded-pill text-sm text-tx2 hover:bg-surface2 hover:text-tx transition-all duration-150 text-left w-full"
+          className="w-full flex items-center gap-3 px-3 py-[9px] rounded-lg text-sm text-tx4 hover:text-tx2 hover:bg-surface2/50 transition-all duration-150 text-left mt-0.5"
           onClick={logout}
         >
-          <Icon name="logout" size={18} />
-          <span>Sign out</span>
+          <Icon name="logout" size={15} />
+          <span className="text-[13px]">Sign out</span>
         </button>
       </div>
     </aside>

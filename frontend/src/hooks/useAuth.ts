@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { auth } from '../lib/api'
 import { clearToken, getToken, setToken } from '../lib/auth'
+import { isOnboardingDone } from '../lib/onboarding'
 import type { User } from '../types/models'
 
 export function useAuth() {
@@ -34,7 +35,7 @@ export function useAuth() {
     setToken(res.access_token)
     const me = await auth.me()
     setUser(me)
-    navigate('/dashboard')
+    navigate(isOnboardingDone() ? '/dashboard' : '/onboarding', { replace: true })
   }
 
   const register = async (email: string, password: string, full_name: string) => {
@@ -42,7 +43,7 @@ export function useAuth() {
     setToken(res.access_token)
     const me = await auth.me()
     setUser(me)
-    navigate('/dashboard')
+    navigate('/onboarding', { replace: true })
   }
 
   const logout = () => {
